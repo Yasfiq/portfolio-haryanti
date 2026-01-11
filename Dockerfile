@@ -20,7 +20,10 @@ COPY packages/database ./packages/database
 COPY packages/typescript-config ./packages/typescript-config
 COPY apps/api ./apps/api
 
-# Generate Prisma client and build
+# Generate Prisma client first
+RUN pnpm --filter @repo/database exec prisma generate
+
+# Build database package and API
 RUN pnpm --filter @repo/database build
 RUN pnpm --filter @portfolio/api build
 
