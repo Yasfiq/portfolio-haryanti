@@ -44,7 +44,7 @@ class ApiClient {
 
             // Handle empty responses
             const text = await response.text();
-            return text ? JSON.parse(text) : null;
+            return text ? JSON.parse(text) : (null as T);
         } catch (error) {
             if (error instanceof Error) {
                 throw error;

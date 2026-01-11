@@ -1,16 +1,11 @@
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-enum SkillCategory {
-  HARD_SKILL
-  SOFT_SKILL
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Admin {
@@ -23,15 +18,15 @@ model Profile {
   id           String      @id @default(uuid())
   fullName     String
   title        String
-  bio          String      @db.Text
+  bio          String
   avatarUrl    String?
   resumeUrl    String?
   email        String
   linkedinUrl  String?
   instagramUrl String?
+  updatedAt    DateTime    @updatedAt
   pinterestUrl String?
   educations   Education[]
-  updatedAt    DateTime    @updatedAt
 }
 
 model Education {
@@ -45,43 +40,40 @@ model Education {
   profile    Profile   @relation(fields: [profileId], references: [id])
 }
 
-// Client/Workplace - Top level grouping for projects
 model Client {
   id          String    @id @default(uuid())
   name        String
   slug        String    @unique
   logoUrl     String?
-  description String?   @db.Text
+  description String?
   order       Int       @default(0)
   isVisible   Boolean   @default(true)
-  projects    Project[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  projects    Project[]
 }
 
 model Project {
   id           String           @id @default(uuid())
   title        String
   slug         String           @unique
-  // Removed: client as string - now using clientId relation
   projectDate  DateTime
-  summary      String           @db.Text
-  problem      String?          @db.Text  // To be removed in frontend, kept in DB for now
-  solution     String?          @db.Text  // To be removed in frontend, kept in DB for now
-  result       String?          @db.Text  // To be removed in frontend, kept in DB for now
+  summary      String
+  problem      String?
+  solution     String?
+  result       String?
   thumbnailUrl String
   videoUrl     String?
   likesCount   Int              @default(0)
   isVisible    Boolean          @default(false)
   order        Int              @default(0)
-  // Relations
-  clientId     String?
-  client       Client?          @relation(fields: [clientId], references: [id])
   categoryId   String?
+  createdAt    DateTime         @default(now())
+  clientId     String?
   category     ProjectCategory? @relation(fields: [categoryId], references: [id])
+  client       Client?          @relation(fields: [clientId], references: [id])
   gallery      ProjectImage[]
   likes        ProjectLike[]
-  createdAt    DateTime         @default(now())
 }
 
 model ProjectImage {
@@ -94,9 +86,9 @@ model ProjectImage {
 model ProjectLike {
   id         String   @id @default(uuid())
   projectId  String
-  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userIpHash String
   createdAt  DateTime @default(now())
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, userIpHash])
 }
@@ -111,8 +103,8 @@ model Experience {
   description     Json
   thumbnailUrl    String?
   logoUrl         String?
-  backgroundColor String?   // Custom background color (e.g., "#1a1a2e")
   order           Int       @default(0)
+  backgroundColor String?
   isVisible       Boolean   @default(true)
 }
 
@@ -122,17 +114,17 @@ model Skill {
   shortName    String?
   iconUrl      String?
   category     SkillCategory
-  description  String?       @db.Text
-  gradientFrom String? // e.g., "#31A8FF"
-  gradientTo   String? // e.g., "#001E36"
-  gradientVia  String? // Optional middle color for 3-color gradients
+  description  String?
+  gradientFrom String?
+  gradientTo   String?
+  gradientVia  String?
   order        Int           @default(0)
 }
 
 model Service {
   id          String  @id @default(uuid())
   title       String
-  description String  @db.Text
+  description String
   iconUrl     String?
   order       Int     @default(0)
 }
@@ -141,28 +133,21 @@ model Message {
   id        String   @id @default(uuid())
   name      String
   email     String
-  content   String   @db.Text
+  content   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
-// ========================================
-// NEW MODELS FOR CMS SYNCHRONIZATION
-// ========================================
-
 model HeroSlide {
   id              String  @id @default(uuid())
   title           String
-  leftTitle       String
-  leftSubtitle    String  @db.Text
-  rightTitle      String
-  rightSubtitle   String
-  imageUrl        String?
-  backgroundColor String? // Optional background color (e.g., "#1a1a2e")
-  backgroundFrom  String? // Optional gradient start color
-  backgroundTo    String? // Optional gradient end color
+  backgroundColor String?
+  backgroundFrom  String?
+  backgroundTo    String?
   order           Int     @default(0)
   isVisible       Boolean @default(true)
+  schema          Json    @default("{}")
+  template        String  @default("classic")
 }
 
 model SiteSettings {
@@ -172,13 +157,13 @@ model SiteSettings {
   faviconUrl     String?
   primaryColor   String   @default("#FFD369")
   secondaryColor String   @default("#EEEEEE")
-  footerText     String?  @db.Text
+  footerText     String?
   ctaHeading     String?
-  ctaDescription String?  @db.Text
+  ctaDescription String?
   ctaButtonText  String?
-  whatsappNumber String?  // e.g., "6281234567890" (without + or spaces)
-  heroTemplate   String   @default("slides") // "slides" or "modern"
   updatedAt      DateTime @updatedAt
+  heroTemplate   String   @default("slides")
+  whatsappNumber String?
 }
 
 model ProjectCategory {
@@ -187,4 +172,9 @@ model ProjectCategory {
   slug     String    @unique
   order    Int       @default(0)
   projects Project[]
+}
+
+enum SkillCategory {
+  HARD_SKILL
+  SOFT_SKILL
 }

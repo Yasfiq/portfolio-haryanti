@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { prisma } from '@repo/database';
+import { prisma, Prisma } from '@repo/database';
 import { CreateHeroSlideDto, UpdateHeroSlideDto, ReorderDto } from './dto';
 
 @Injectable()
@@ -24,7 +24,13 @@ export class HeroSlidesService {
 
         return prisma.heroSlide.create({
             data: {
-                ...createHeroSlideDto,
+                title: createHeroSlideDto.title,
+                template: createHeroSlideDto.template,
+                schema: createHeroSlideDto.schema as unknown as Prisma.InputJsonObject,
+                backgroundColor: createHeroSlideDto.backgroundColor,
+                backgroundFrom: createHeroSlideDto.backgroundFrom,
+                backgroundTo: createHeroSlideDto.backgroundTo,
+                isVisible: createHeroSlideDto.isVisible,
                 order: (maxOrder._max.order || 0) + 1,
             },
         });
@@ -38,7 +44,15 @@ export class HeroSlidesService {
 
         return prisma.heroSlide.update({
             where: { id },
-            data: updateHeroSlideDto,
+            data: {
+                title: updateHeroSlideDto.title,
+                template: updateHeroSlideDto.template,
+                schema: updateHeroSlideDto.schema as unknown as Prisma.InputJsonObject | undefined,
+                backgroundColor: updateHeroSlideDto.backgroundColor,
+                backgroundFrom: updateHeroSlideDto.backgroundFrom,
+                backgroundTo: updateHeroSlideDto.backgroundTo,
+                isVisible: updateHeroSlideDto.isVisible,
+            },
         });
     }
 

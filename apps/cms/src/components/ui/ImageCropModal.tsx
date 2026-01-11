@@ -259,6 +259,7 @@ export default function ImageCropModal({
 
 /**
  * Utility function to create cropped image from the crop area
+ * Uses PNG format to preserve transparency
  */
 async function getCroppedImg(
     imageSrc: string,
@@ -305,7 +306,7 @@ async function getCroppedImg(
         Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
     );
 
-    // Return as blob
+    // Return as PNG blob to preserve transparency
     return new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {
             if (blob) {
@@ -313,7 +314,7 @@ async function getCroppedImg(
             } else {
                 reject(new Error('Canvas is empty'));
             }
-        }, 'image/jpeg', 0.9);
+        }, 'image/png'); // Use PNG to preserve transparency
     });
 }
 

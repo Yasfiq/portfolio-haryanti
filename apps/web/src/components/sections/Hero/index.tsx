@@ -2,28 +2,33 @@ import { useRef, useEffect, useMemo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useHeroSlides } from '../../../hooks/useHeroSlides';
+import HeroFunSlide from './HeroFunSlide';
+import HeroClassicPanel from './HeroClassicPanel';
+import type { HeroSlide, ClassicSchemaContent, FunSchemaContent } from '../../../types';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const NAVBAR_HEIGHT = 90;
 
 // Fallback data while loading or if API fails
-const fallbackPanels = [
-    {
-        id: 'fallback-1',
+const fallbackSlide: HeroSlide = {
+    id: 'fallback-1',
+    title: "Hello, I'm Haryanti",
+    template: 'classic',
+    schema: {
         title: "Hello, I'm Haryanti",
         leftTitle: 'Graphic Designer',
         leftSubtitle: 'Skilled in visual design for branding & marketing.',
         rightTitle: 'Content Creator',
         rightSubtitle: 'Crafting engaging stories that resonate with audiences',
-        imageUrl: undefined as string | undefined,
-        backgroundColor: undefined as string | undefined,
-        backgroundFrom: undefined as string | undefined,
-        backgroundTo: undefined as string | undefined,
-        order: 0,
-        isVisible: true,
-    },
-];
+        imageUrl: '',
+    } as ClassicSchemaContent,
+    backgroundColor: undefined,
+    backgroundFrom: undefined,
+    backgroundTo: undefined,
+    order: 0,
+    isVisible: true,
+};
 
 const Hero = () => {
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -34,21 +39,25 @@ const Hero = () => {
     const { data: heroSlides, isLoading, error } = useHeroSlides();
 
     // Use API data or fallback
-    const panels = useMemo(() => {
+    const slides = useMemo(() => {
         if (heroSlides && heroSlides.length > 0) {
             return heroSlides;
         }
-        return fallbackPanels;
+        return [fallbackSlide];
     }, [heroSlides]);
+
+    // Check if we should use horizontal scroll (more than 1 slide)
+    const useHorizontalScroll = slides.length > 1;
 
     useEffect(() => {
         const section = sectionRef.current;
         const trigger = triggerRef.current;
         const panelsContainer = panelsRef.current;
 
-        if (!section || !trigger || !panelsContainer || isLoading) return;
+        // Only apply horizontal scroll if we have multiple slides
+        if (!section || !trigger || !panelsContainer || isLoading || !useHorizontalScroll) return;
 
-        const panelCount = panels.length;
+        const panelCount = slides.length;
         const panelWidth = window.innerWidth;
         const totalScrollWidth = (panelCount - 1) * panelWidth;
 
@@ -95,7 +104,7 @@ const Hero = () => {
             ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
             observer.disconnect();
         };
-    }, [panels, isLoading]);
+    }, [slides, isLoading, useHorizontalScroll]);
 
     const heroHeight = `calc(100vh - ${NAVBAR_HEIGHT}px)`;
 
@@ -122,17 +131,47 @@ const Hero = () => {
         console.error('Failed to load hero slides:', error);
     }
 
-    // Helper to get background style for a panel
-    const getPanelBackground = (panel: typeof panels[0]) => {
-        if (panel.backgroundFrom && panel.backgroundTo) {
-            return `linear-gradient(135deg, ${panel.backgroundFrom}, ${panel.backgroundTo})`;
-        }
-        if (panel.backgroundColor) {
-            return panel.backgroundColor;
-        }
-        return 'transparent';
-    };
+    // Single slide - render based on template (no horizontal scroll)
+    if (!useHorizontalScroll) {
+        const slide = slides[0];
 
+        if (slide.template === 'fun') {
+            const schema = slide.schema as FunSchemaContent;
+            return (
+                <HeroFunSlide
+                    greeting={schema.greeting}
+                    name={schema.name}
+                    role={schema.role}
+                    quotes={schema.quotes}
+                    experience={schema.experience}
+                    imageUrl={schema.imageUrl}
+                    backgroundColor={slide.backgroundColor}
+                    backgroundFrom={slide.backgroundFrom}
+                    backgroundTo={slide.backgroundTo}
+                />
+            );
+        }
+
+        // Classic template - single panel
+        const schema = slide.schema as ClassicSchemaContent;
+        return (
+            <>
+                <div style={{ height: `${NAVBAR_HEIGHT}px` }} />
+                <section
+                    className="w-full overflow-hidden bg-background"
+                    style={{ height: heroHeight }}
+                >
+                    <HeroClassicPanel
+                        slide={slide}
+                        schema={schema}
+                        index={0}
+                    />
+                </section>
+            </>
+        );
+    }
+
+    // Multiple slides - horizontal scroll
     return (
         <>
             {/* Spacer for navbar */}
@@ -149,94 +188,43 @@ const Hero = () => {
                     <div
                         ref={panelsRef}
                         className="flex h-full"
-                        style={{ width: `${panels.length * 100}vw` }}
+                        style={{ width: `${slides.length * 100}vw` }}
                     >
-                        {panels.map((panel, index) => {
-                            const bgStyle = getPanelBackground(panel);
-                            const hasBackground = bgStyle !== 'transparent';
+                        {slides.map((slide, index) => {
+                            // Render each panel based on its template
+                            if (slide.template === 'fun') {
+                                const schema = slide.schema as FunSchemaContent;
+                                return (
+                                    <div
+                                        key={slide.id}
+                                        className="hero-panel flex-shrink-0"
+                                        style={{ width: '100vw', height: '100%' }}
+                                    >
+                                        <HeroFunSlide
+                                            greeting={schema.greeting}
+                                            name={schema.name}
+                                            role={schema.role}
+                                            quotes={schema.quotes}
+                                            experience={schema.experience}
+                                            imageUrl={schema.imageUrl}
+                                            backgroundColor={slide.backgroundColor}
+                                            backgroundFrom={slide.backgroundFrom}
+                                            backgroundTo={slide.backgroundTo}
+                                            isInHorizontalScroll={true}
+                                        />
+                                    </div>
+                                );
+                            }
 
+                            // Classic template
+                            const schema = slide.schema as ClassicSchemaContent;
                             return (
-                                <div
-                                    key={panel.id}
-                                    className="hero-panel flex flex-col flex-shrink-0 relative"
-                                    style={{
-                                        width: '100vw',
-                                        height: '100%',
-                                        background: bgStyle,
-                                    }}
-                                >
-                                    {/* Overlay for better text readability on colored backgrounds */}
-                                    {hasBackground && (
-                                        <div className="absolute inset-0 bg-background/60 pointer-events-none" />
-                                    )}
-
-                                    {/* Top - Title */}
-                                    <div className="relative z-10 h-[10%] md:h-[15%] flex items-center justify-center px-4">
-                                        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-center">
-                                            {panel.title}
-                                        </h1>
-                                    </div>
-
-                                    {/* Main Content - Mobile: Vertical Stack, Desktop: 3-column */}
-                                    <div className="relative z-10 flex-1 flex flex-col md:flex-row">
-
-                                        {/* Desktop: Left Text */}
-                                        <div className="hidden md:flex w-[25%] items-center justify-center px-golden-4">
-                                            <div className="text-left max-w-xs">
-                                                <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">
-                                                    {panel.leftTitle}
-                                                </h3>
-                                                <p className="text-xs md:text-sm text-muted leading-relaxed">
-                                                    {panel.leftSubtitle}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Center - Image */}
-                                        <div className="w-full md:w-[50%] flex items-center justify-center p-4 md:p-golden-5 order-1 md:order-none flex-shrink-0 h-[45%] md:h-auto">
-                                            <div className="relative w-full h-full max-w-sm md:max-w-lg flex items-center justify-center">
-                                                {panel.imageUrl ? (
-                                                    <img
-                                                        src={panel.imageUrl}
-                                                        alt={panel.title}
-                                                        className="w-full h-full object-contain rounded-2xl md:rounded-3xl"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gradient-to-br from-primary/30 via-primary/10 to-transparent rounded-2xl md:rounded-3xl flex items-center justify-center">
-                                                        <span className="text-muted text-sm">Image {index + 1}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Mobile: Content Below Image */}
-                                        <div className="flex md:hidden flex-col items-center justify-start px-6 py-4 order-2 flex-1 overflow-y-auto">
-                                            <div className="text-center max-w-sm">
-                                                <h3 className="text-base font-semibold text-foreground mb-2">
-                                                    {panel.leftTitle}
-                                                </h3>
-                                                <p className="text-sm text-muted leading-relaxed">
-                                                    {panel.leftSubtitle}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Desktop: Right Text */}
-                                        <div className="hidden md:flex w-[25%] items-center justify-center px-golden-4">
-                                            <div className="text-right max-w-xs">
-                                                <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">
-                                                    {panel.rightTitle}
-                                                </h3>
-                                                <p className="text-xs md:text-sm text-muted leading-relaxed">
-                                                    {panel.rightSubtitle}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Bottom spacing */}
-                                    {/* <div className="relative z-10 h-[5%] md:h-[10%]" /> */}
-                                </div>
+                                <HeroClassicPanel
+                                    key={slide.id}
+                                    slide={slide}
+                                    schema={schema}
+                                    index={index}
+                                />
                             );
                         })}
                     </div>
