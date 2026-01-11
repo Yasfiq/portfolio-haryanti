@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react';
-import { Plus, Pencil, Trash2, GripVertical, Eye, EyeOff, Image, AlertCircle, RefreshCw, Layers, Upload, X, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, GripVertical, Eye, EyeOff, AlertCircle, RefreshCw, Layers } from 'lucide-react';
 import ImageCropModal from '../components/ui/ImageCropModal';
 import { useUpload } from '../hooks/useUpload';
 import { Card, CardHeader } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
-import Textarea from '../components/ui/Textarea';
 import { HeroSlidesSkeleton } from '../components/skeletons/HeroSlidesSkeleton';
+import { ClassicTemplateForm, FunTemplateForm } from '../components/hero';
 import {
     useHeroSlides,
     useCreateHeroSlide,
@@ -17,17 +17,21 @@ import {
     useReorderHeroSlides
 } from '../hooks/useHeroSlides';
 import { useToastHelpers } from '../context/ToastContext';
-import type { HeroSlide } from '../types/heroSlide.types';
+import type {
+    HeroSlide,
+    HeroTemplate,
+    ClassicSchemaContent,
+    FunSchemaContent,
+    HeroSchemaContent
+} from '../types/heroSlide.types';
+import { getDefaultSchema, getDefaultClassicSchema, getDefaultFunSchema } from '../types/heroSlide.types';
 
 type BackgroundType = 'none' | 'solid' | 'gradient';
 
 interface FormData {
     title: string;
-    leftTitle: string;
-    leftSubtitle: string;
-    rightTitle: string;
-    rightSubtitle: string;
-    imageUrl: string | null;
+    template: HeroTemplate;
+    schema: HeroSchemaContent;
     backgroundColor: string | null;
     backgroundFrom: string | null;
     backgroundTo: string | null;
@@ -36,11 +40,8 @@ interface FormData {
 
 const defaultFormData: FormData = {
     title: '',
-    leftTitle: '',
-    leftSubtitle: '',
-    rightTitle: '',
-    rightSubtitle: '',
-    imageUrl: null,
+    template: 'classic',
+    schema: getDefaultClassicSchema(),
     backgroundColor: null,
     backgroundFrom: null,
     backgroundTo: null,
@@ -73,23 +74,26 @@ export default function HeroSlides() {
     const [backgroundType, setBackgroundType] = useState<BackgroundType>('none');
 
     // Image upload state
-    const imageInputRef = useRef<HTMLInputElement>(null);
     const [imageToCrop, setImageToCrop] = useState<string | null>(null);
     const [cropModalOpen, setCropModalOpen] = useState(false);
     const { upload, isUploading } = useUpload();
 
-    // Handle image select
-    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                setImageToCrop(event.target?.result as string);
-                setCropModalOpen(true);
-            };
-            reader.readAsDataURL(file);
+    // Get image URL from current schema
+    const getCurrentImageUrl = (): string | null => {
+        if ('imageUrl' in formData.schema) {
+            return formData.schema.imageUrl || null;
         }
-        e.target.value = '';
+        return null;
+    };
+
+    // Handle image select (from child form)
+    const handleImageSelect = (file: File) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            setImageToCrop(event.target?.result as string);
+            setCropModalOpen(true);
+        };
+        reader.readAsDataURL(file);
     };
 
     // Handle crop complete
@@ -97,7 +101,10 @@ export default function HeroSlides() {
         const file = new File([croppedBlob], 'hero-image.jpg', { type: 'image/jpeg' });
         const result = await upload(file);
         if (result) {
-            setFormData({ ...formData, imageUrl: result.url });
+            setFormData({
+                ...formData,
+                schema: { ...formData.schema, imageUrl: result.url }
+            });
         }
         setCropModalOpen(false);
         setImageToCrop(null);
@@ -105,7 +112,24 @@ export default function HeroSlides() {
 
     // Remove image
     const handleRemoveImage = () => {
-        setFormData({ ...formData, imageUrl: null });
+        setFormData({
+            ...formData,
+            schema: { ...formData.schema, imageUrl: '' }
+        });
+    };
+
+    // Handle template change
+    const handleTemplateChange = (template: HeroTemplate) => {
+        setFormData({
+            ...formData,
+            template,
+            schema: getDefaultSchema(template),
+        });
+    };
+
+    // Handle schema change from child forms
+    const handleSchemaChange = (schema: HeroSchemaContent) => {
+        setFormData({ ...formData, schema });
     };
 
     const openAddModal = () => {
@@ -117,11 +141,8 @@ export default function HeroSlides() {
     const openEditModal = (slide: HeroSlide) => {
         setFormData({
             title: slide.title,
-            leftTitle: slide.leftTitle,
-            leftSubtitle: slide.leftSubtitle,
-            rightTitle: slide.rightTitle,
-            rightSubtitle: slide.rightSubtitle,
-            imageUrl: slide.imageUrl,
+            template: slide.template,
+            schema: slide.schema,
             backgroundColor: slide.backgroundColor,
             backgroundFrom: slide.backgroundFrom,
             backgroundTo: slide.backgroundTo,
@@ -138,7 +159,7 @@ export default function HeroSlides() {
     };
 
     const handleSave = async () => {
-        if (!formData.title.trim() || !formData.leftTitle.trim() || !formData.rightTitle.trim()) return;
+        if (!formData.title.trim()) return;
 
         // Clean background fields based on type
         const cleanedData = { ...formData };
@@ -260,6 +281,22 @@ export default function HeroSlides() {
         return 'var(--cms-bg-secondary)';
     };
 
+    const getSlidePreviewImage = (slide: HeroSlide): string | null => {
+        if ('imageUrl' in slide.schema) {
+            return slide.schema.imageUrl || null;
+        }
+        return null;
+    };
+
+    const getSlideDescription = (slide: HeroSlide): string => {
+        if (slide.template === 'classic') {
+            const schema = slide.schema as ClassicSchemaContent;
+            return `${schema.leftTitle || ''} • ${schema.rightTitle || ''}`.trim();
+        }
+        const schema = slide.schema as FunSchemaContent;
+        return `${schema.name || ''} - ${schema.role || ''}`.trim();
+    };
+
     // Loading state
     if (isLoading) {
         return <HeroSlidesSkeleton />;
@@ -333,11 +370,11 @@ export default function HeroSlides() {
                             {/* Preview */}
                             <div
                                 className="w-24 h-16 rounded-lg flex items-center justify-center flex-shrink-0 border border-cms-border overflow-hidden"
-                                style={{ background: slide.imageUrl ? 'transparent' : getBackgroundPreview(slide) }}
+                                style={{ background: getSlidePreviewImage(slide) ? 'transparent' : getBackgroundPreview(slide) }}
                             >
-                                {slide.imageUrl ? (
+                                {getSlidePreviewImage(slide) ? (
                                     <img
-                                        src={slide.imageUrl}
+                                        src={getSlidePreviewImage(slide)!}
                                         alt={slide.title}
                                         className="w-full h-full object-cover"
                                     />
@@ -352,6 +389,12 @@ export default function HeroSlides() {
                                     <h3 className="font-medium text-cms-text-primary truncate">
                                         {slide.title}
                                     </h3>
+                                    <span className={`text-xs px-2 py-0.5 rounded ${slide.template === 'classic'
+                                            ? 'bg-blue-500/20 text-blue-400'
+                                            : 'bg-purple-500/20 text-purple-400'
+                                        }`}>
+                                        {slide.template}
+                                    </span>
                                     {!slide.isVisible && (
                                         <span className="text-xs px-2 py-0.5 bg-cms-bg-secondary rounded text-cms-text-muted">
                                             Hidden
@@ -359,13 +402,12 @@ export default function HeroSlides() {
                                     )}
                                 </div>
                                 <p className="text-sm text-cms-text-muted truncate mt-0.5">
-                                    {slide.leftTitle} • {slide.rightTitle}
+                                    {getSlideDescription(slide)}
                                 </p>
                             </div>
 
                             {/* Actions */}
                             <div className="flex items-center gap-1">
-                                {/* Hide toggle button if only 1 visible slide and this is visible */}
                                 {(() => {
                                     const visibleCount = slides.filter(s => s.isVisible).length;
                                     const isLastVisible = slide.isVisible && visibleCount <= 1;
@@ -427,107 +469,69 @@ export default function HeroSlides() {
                 size="lg"
             >
                 <div className="space-y-6">
-                    {/* Main Title */}
+                    {/* Slide Title */}
                     <Input
-                        label="Judul Utama"
-                        placeholder="contoh: Hello, I'm Haryanti"
+                        label="Nama Slide"
+                        placeholder="contoh: Hero Utama"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     />
 
-                    {/* Left & Right Content */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                            <h4 className="text-sm font-medium text-cms-text-secondary">Sisi Kiri</h4>
-                            <Input
-                                label="Judul"
-                                placeholder="contoh: Graphic Designer"
-                                value={formData.leftTitle}
-                                onChange={(e) => setFormData({ ...formData, leftTitle: e.target.value })}
-                            />
-                            <Textarea
-                                label="Subjudul"
-                                placeholder="Deskripsi singkat..."
-                                value={formData.leftSubtitle}
-                                onChange={(e) => setFormData({ ...formData, leftSubtitle: e.target.value })}
-                            />
-                        </div>
-                        <div className="space-y-3">
-                            <h4 className="text-sm font-medium text-cms-text-secondary">Sisi Kanan</h4>
-                            <Input
-                                label="Judul"
-                                placeholder="contoh: Content Creator"
-                                value={formData.rightTitle}
-                                onChange={(e) => setFormData({ ...formData, rightTitle: e.target.value })}
-                            />
-                            <Textarea
-                                label="Subjudul"
-                                placeholder="Deskripsi singkat..."
-                                value={formData.rightSubtitle}
-                                onChange={(e) => setFormData({ ...formData, rightSubtitle: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Hero Image Upload */}
+                    {/* Template Selector */}
                     <div className="space-y-3">
                         <label className="block text-sm font-medium text-cms-text-secondary">
-                            Gambar Hero (Opsional)
+                            Template
                         </label>
-
-                        {formData.imageUrl ? (
-                            <div className="relative group">
-                                <img
-                                    src={formData.imageUrl}
-                                    alt="Hero preview"
-                                    className="w-full h-48 object-cover rounded-lg border border-cms-border"
-                                />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-lg">
-                                    <button
-                                        type="button"
-                                        onClick={() => imageInputRef.current?.click()}
-                                        className="p-2 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-colors"
-                                    >
-                                        <Upload size={18} />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleRemoveImage}
-                                        className="p-2 bg-red-500/80 rounded-lg text-white hover:bg-red-500 transition-colors"
-                                    >
-                                        <X size={18} />
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
+                        <div className="grid grid-cols-2 gap-3">
                             <button
                                 type="button"
-                                onClick={() => imageInputRef.current?.click()}
-                                disabled={isUploading}
-                                className="w-full h-32 border-2 border-dashed border-cms-border rounded-lg flex flex-col items-center justify-center gap-2 hover:border-cms-accent transition-colors disabled:opacity-50"
+                                onClick={() => handleTemplateChange('classic')}
+                                className={`p-4 rounded-xl border-2 transition-all text-left ${formData.template === 'classic'
+                                        ? 'border-cms-accent bg-cms-accent/10'
+                                        : 'border-cms-border hover:border-cms-accent/50'
+                                    }`}
                             >
-                                {isUploading ? (
-                                    <Loader2 size={24} className="text-cms-text-muted animate-spin" />
-                                ) : (
-                                    <>
-                                        <Image size={24} className="text-cms-text-muted" />
-                                        <span className="text-sm text-cms-text-muted">Klik untuk upload gambar</span>
-                                    </>
-                                )}
+                                <h4 className="font-medium text-cms-text-primary">Classic</h4>
+                                <p className="text-sm text-cms-text-muted mt-1">
+                                    Layout tradisional dengan konten kiri/kanan
+                                </p>
                             </button>
-                        )}
-
-                        <input
-                            ref={imageInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageSelect}
-                        />
-                        <p className="text-xs text-cms-text-muted">
-                            Gambar akan ditampilkan di tengah slide. Recommended: 800x600px atau lebih
-                        </p>
+                            <button
+                                type="button"
+                                onClick={() => handleTemplateChange('fun')}
+                                className={`p-4 rounded-xl border-2 transition-all text-left ${formData.template === 'fun'
+                                        ? 'border-cms-accent bg-cms-accent/10'
+                                        : 'border-cms-border hover:border-cms-accent/50'
+                                    }`}
+                            >
+                                <h4 className="font-medium text-cms-text-primary">Fun</h4>
+                                <p className="text-sm text-cms-text-muted mt-1">
+                                    Modern dengan greeting, quote, dan foto profil
+                                </p>
+                            </button>
+                        </div>
                     </div>
+
+                    {/* Template-specific Form */}
+                    {formData.template === 'classic' ? (
+                        <ClassicTemplateForm
+                            schema={formData.schema as ClassicSchemaContent}
+                            onChange={handleSchemaChange}
+                            imageUrl={getCurrentImageUrl()}
+                            onImageSelect={handleImageSelect}
+                            onImageRemove={handleRemoveImage}
+                            isUploading={isUploading}
+                        />
+                    ) : (
+                        <FunTemplateForm
+                            schema={formData.schema as FunSchemaContent}
+                            onChange={handleSchemaChange}
+                            imageUrl={getCurrentImageUrl()}
+                            onImageSelect={handleImageSelect}
+                            onImageRemove={handleRemoveImage}
+                            isUploading={isUploading}
+                        />
+                    )}
 
                     {/* Background Options */}
                     <div className="space-y-3">
@@ -644,7 +648,7 @@ export default function HeroSlides() {
                         <Button
                             variant="primary"
                             onClick={handleSave}
-                            disabled={!formData.title.trim() || !formData.leftTitle.trim() || !formData.rightTitle.trim()}
+                            disabled={!formData.title.trim()}
                             isLoading={createMutation.isPending || updateMutation.isPending}
                         >
                             {editModal.slide ? 'Simpan' : 'Tambah'}
@@ -689,9 +693,9 @@ export default function HeroSlides() {
                     }}
                     imageSrc={imageToCrop}
                     onCropComplete={handleCropComplete}
-                    aspectRatio={4 / 3}
-                    title="Crop Gambar Hero"
-                    showAspectPresets={true}
+                    aspectRatio={formData.template === 'fun' ? 1 : 4 / 3}
+                    title={formData.template === 'fun' ? 'Crop Foto Profil' : 'Crop Gambar Hero'}
+                    showAspectPresets={formData.template === 'classic'}
                 />
             )}
         </div>
