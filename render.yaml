@@ -1,0 +1,48 @@
+# Render Blueprint for Portfolio Haryanti API
+# Documentation: https://render.com/docs/blueprint-spec
+
+services:
+  # NestJS Backend API
+  - type: web
+    name: portfolio-api
+    runtime: node
+    region: singapore # Closest to Indonesia
+    plan: free
+    rootDir: apps/api
+    buildCommand: |
+      cd ../..
+      npm install -g pnpm
+      pnpm install --frozen-lockfile
+      pnpm --filter @repo/database db:generate
+      pnpm --filter @portfolio/api build
+    startCommand: node dist/main
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3002
+      - key: DATABASE_URL
+        sync: false # Set manually in dashboard
+      - key: DIRECT_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: S3_BUCKET_NAME
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: WEB_URL
+        sync: false # e.g., https://your-portfolio.vercel.app
+      - key: CMS_URL
+        sync: false # e.g., https://your-cms.vercel.app
