@@ -89,12 +89,12 @@ const Preloader = () => {
             {/* Animated text with staggered letters */}
             <div
                 ref={textContainerRef}
-                className="overflow-hidden flex perspective-1000"
+                className="flex perspective-1000"
             >
                 {name.split('').map((letter, index) => (
                     <span
                         key={index}
-                        className="letter text-4xl md:text-6xl lg:text-8xl font-bold tracking-wider text-foreground inline-block"
+                        className="letter text-4xl md:text-6xl lg:text-8xl tracking-wider text-foreground inline-block"
                         style={{
                             transformStyle: 'preserve-3d',
                         }}

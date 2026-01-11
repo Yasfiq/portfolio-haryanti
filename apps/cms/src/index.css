@@ -4,6 +4,15 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Change font ini public/fonts and bottom body font-family */
+/* @font-face {
+  font-family: 'Nice Tango';
+  src: url('/fonts/Nice Tango.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+} */
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -141,6 +150,7 @@
       transform: translateX(100%);
       opacity: 0;
     }
+
     to {
       transform: translateX(0);
       opacity: 1;
