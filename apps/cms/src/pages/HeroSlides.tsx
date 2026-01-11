@@ -24,7 +24,7 @@ import type {
     FunSchemaContent,
     HeroSchemaContent
 } from '../types/heroSlide.types';
-import { getDefaultSchema, getDefaultClassicSchema, getDefaultFunSchema } from '../types/heroSlide.types';
+import { getDefaultSchema, getDefaultClassicSchema } from '../types/heroSlide.types';
 
 type BackgroundType = 'none' | 'solid' | 'gradient';
 
@@ -390,8 +390,8 @@ export default function HeroSlides() {
                                         {slide.title}
                                     </h3>
                                     <span className={`text-xs px-2 py-0.5 rounded ${slide.template === 'classic'
-                                            ? 'bg-blue-500/20 text-blue-400'
-                                            : 'bg-purple-500/20 text-purple-400'
+                                        ? 'bg-blue-500/20 text-blue-400'
+                                        : 'bg-purple-500/20 text-purple-400'
                                         }`}>
                                         {slide.template}
                                     </span>
@@ -487,8 +487,8 @@ export default function HeroSlides() {
                                 type="button"
                                 onClick={() => handleTemplateChange('classic')}
                                 className={`p-4 rounded-xl border-2 transition-all text-left ${formData.template === 'classic'
-                                        ? 'border-cms-accent bg-cms-accent/10'
-                                        : 'border-cms-border hover:border-cms-accent/50'
+                                    ? 'border-cms-accent bg-cms-accent/10'
+                                    : 'border-cms-border hover:border-cms-accent/50'
                                     }`}
                             >
                                 <h4 className="font-medium text-cms-text-primary">Classic</h4>
@@ -500,8 +500,8 @@ export default function HeroSlides() {
                                 type="button"
                                 onClick={() => handleTemplateChange('fun')}
                                 className={`p-4 rounded-xl border-2 transition-all text-left ${formData.template === 'fun'
-                                        ? 'border-cms-accent bg-cms-accent/10'
-                                        : 'border-cms-border hover:border-cms-accent/50'
+                                    ? 'border-cms-accent bg-cms-accent/10'
+                                    : 'border-cms-border hover:border-cms-accent/50'
                                     }`}
                             >
                                 <h4 className="font-medium text-cms-text-primary">Fun</h4>
