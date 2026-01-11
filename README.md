@@ -1,135 +1,186 @@
-# Turborepo starter
+# 🎨 Portofolio Haryanti
 
-This Turborepo starter is maintained by the Turborepo core team.
+> Modern portfolio website for a Graphic Designer & Content Creator, built with a headless CMS architecture.
 
-## Using this example
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
+[![NestJS](https://img.shields.io/badge/NestJS-11-e0234e?logo=nestjs)](https://nestjs.com/)
+[![Turborepo](https://img.shields.io/badge/Turborepo-2.7-000?logo=turborepo)](https://turborepo.com/)
 
-Run the following command:
+## 📋 Overview
 
-```sh
-npx create-turbo@latest
+This project is a professional portfolio website featuring:
+- **Portfolio Website** (`apps/web`) - Public-facing portfolio with smooth animations
+- **CMS Admin** (`apps/cms`) - Content management system for easy updates
+- **Backend API** (`apps/api`) - RESTful API powering both frontends
+
+## 🛠 Tech Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| **Frontend** | React 19, Vite 7, TailwindCSS 3, GSAP, Lenis |
+| **Backend** | NestJS 11, Prisma 6, PostgreSQL |
+| **Auth** | Supabase Authentication |
+| **Storage** | AWS S3 |
+| **Monorepo** | Turborepo, pnpm |
+
+## 📁 Project Structure
+
+```
+portofolio-haryanti/
+├── apps/
+│   ├── web/          # Portfolio frontend (Port 3000)
+│   ├── cms/          # Admin CMS (Port 3001)
+│   └── api/          # Backend API (Port 3002)
+├── packages/
+│   ├── database/     # Prisma schema & client
+│   ├── ts-types/     # Shared Zod schemas
+│   ├── ui/           # Shared UI components
+│   ├── eslint-config/
+│   └── typescript-config/
+└── turbo.json
 ```
 
-## What's inside?
+## 🚀 Getting Started
 
-This Turborepo includes the following packages/apps:
+### Prerequisites
 
-### Apps and Packages
+- Node.js >= 18
+- pnpm 9.0.0
+- PostgreSQL database (or Supabase)
+- AWS S3 bucket
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Installation
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+```bash
+# Clone the repository
+git clone <repository-url>
+cd portofolio-haryanti
 
-### Utilities
+# Install dependencies
+pnpm install
 
-This Turborepo has some additional tools already setup for you:
+# Setup environment variables (copy and edit .env.example files)
+cp apps/api/.env.example apps/api/.env
+cp apps/cms/.env.example apps/cms/.env
+cp apps/web/.env.example apps/web/.env
+cp packages/database/.env.example packages/database/.env
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+# Push database schema
+pnpm --filter @repo/database db:push
+
+# Seed database (optional)
+pnpm --filter @repo/database db:seed
+```
+
+### Development
+
+```bash
+# Start all apps
+pnpm dev
+
+# Start specific app
+pnpm --filter web dev      # Portfolio (localhost:3000)
+pnpm --filter cms dev      # CMS (localhost:3001)
+pnpm --filter api dev      # API (localhost:3002)
+```
 
 ### Build
 
-To build all apps and packages, run the following command:
+```bash
+# Build all apps
+pnpm build
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+# Build specific app
+pnpm --filter web build
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## 📜 Available Scripts
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` | Start all apps in development mode |
+| `pnpm build` | Build all apps for production |
+| `pnpm lint` | Run ESLint across all packages |
+| `pnpm test` | Run unit tests |
+| `pnpm test:e2e` | Run E2E tests with Playwright |
+| `pnpm format` | Format code with Prettier |
+| `pnpm check-types` | TypeScript type checking |
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+## 🗄 Database Commands
 
-### Develop
+```bash
+# Generate Prisma client
+pnpm --filter @repo/database db:generate
 
-To develop all apps and packages, run the following command:
+# Push schema to database
+pnpm --filter @repo/database db:push
 
-```
-cd my-turborepo
+# Run migrations
+pnpm --filter @repo/database db:migrate
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+# Open Prisma Studio
+pnpm --filter @repo/database db:studio
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+# Seed database
+pnpm --filter @repo/database db:seed
 ```
 
-### Remote Caching
+## 🔐 Environment Variables
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+### apps/api/.env
+```env
+DATABASE_URL="postgresql://..."
+SUPABASE_URL="https://..."
+SUPABASE_SERVICE_KEY="..."
+AWS_ACCESS_KEY_ID="..."
+AWS_SECRET_ACCESS_KEY="..."
+S3_BUCKET_NAME="..."
+RESEND_API_KEY="..."
+WEB_URL="http://localhost:3000"
+CMS_URL="http://localhost:3001"
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+### apps/cms/.env
+```env
+VITE_API_URL="http://localhost:3002/api"
+VITE_SUPABASE_URL="https://..."
+VITE_SUPABASE_ANON_KEY="..."
 ```
 
-## Useful Links
+### apps/web/.env
+```env
+VITE_API_URL="http://localhost:3002/api"
+```
 
-Learn more about the power of Turborepo:
+## ✨ Features
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+### Portfolio Website
+- 🎯 Smooth scroll with Lenis
+- 🎨 GSAP animations
+- 📱 Fully responsive design
+- 🔍 SEO optimized with React Helmet
+- ⚡ Fast loading with Vite
+
+### CMS Admin
+- 🔐 Supabase authentication
+- 📝 Full CRUD for all content
+- 🖼 Image upload with cropping
+- 📊 Dashboard analytics
+- 🔄 Drag & drop reordering
+- 📱 Offline detection
+
+### Backend API
+- 🛡 Helmet security headers
+- ⏱ Rate limiting (100 req/min)
+- ✅ DTO validation
+- 📤 S3 file upload
+- 📧 Email with Resend
+
+## 📖 Documentation
+
+For detailed documentation, see [DOCUMENTATION.md](./DOCUMENTATION.md).
+
+## 📄 License
+
+Private - All rights reserved.
