@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #141414;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a3a;
+  }
+}
+
+@layer components {
+
+  /* Card styles */
+  .cms-card {
+    @apply bg-cms-bg-card border border-cms-border rounded-xl p-6;
+  }
+
+  /* Input styles */
+  .cms-input {
+    @apply w-full bg-cms-bg-secondary border border-cms-border rounded-lg px-4 py-3 text-cms-text-primary placeholder:text-cms-text-muted focus:outline-none focus:border-cms-accent focus:ring-1 focus:ring-cms-accent transition-colors duration-200;
+  }
+
+  /* Button base */
+  .cms-btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .cms-btn-primary {
+    @apply cms-btn bg-cms-accent text-black hover:bg-cms-accent-hover;
+  }
+
+  .cms-btn-secondary {
+    @apply cms-btn bg-cms-bg-secondary border border-cms-border text-cms-text-primary hover:bg-cms-bg-hover hover:border-cms-text-muted;
+  }
+
+  .cms-btn-danger {
+    @apply cms-btn bg-cms-error/10 text-cms-error border border-cms-error/30 hover:bg-cms-error hover:text-white hover:border-cms-error;
+  }
+
+  .cms-btn-ghost {
+    @apply cms-btn text-cms-text-secondary hover:text-cms-text-primary hover:bg-cms-bg-hover;
+  }
+
+  /* Table styles */
+  .cms-table {
+    @apply w-full border-collapse;
+  }
+
+  .cms-table th {
+    @apply text-left text-xs font-medium text-cms-text-secondary uppercase tracking-wider px-4 py-3 border-b border-cms-border;
+  }
+
+  .cms-table td {
+    @apply px-4 py-4 border-b border-cms-border text-cms-text-primary;
+  }
+
+  .cms-table tr:hover td {
+    @apply bg-cms-bg-hover;
+  }
+
+  /* Badge styles */
+  .cms-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .cms-badge-success {
+    @apply cms-badge bg-cms-success/10 text-cms-success;
+  }
+
+  .cms-badge-warning {
+    @apply cms-badge bg-cms-warning/10 text-cms-warning;
+  }
+
+  .cms-badge-error {
+    @apply cms-badge bg-cms-error/10 text-cms-error;
+  }
+
+  /* Form label */
+  .cms-label {
+    @apply block text-sm font-medium text-cms-text-secondary mb-2;
+  }
+
+  /* Form error */
+  .cms-error {
+    @apply text-xs text-cms-error mt-1;
+  }
+}
+
+@layer utilities {
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-cms-accent to-cms-accent-hover bg-clip-text text-transparent;
+  }
+
+  /* Glass effect */
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Toast slide-in animation */
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+}

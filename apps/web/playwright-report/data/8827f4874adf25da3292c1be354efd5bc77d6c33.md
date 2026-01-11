@@ -1,0 +1,246 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e5]: H
+    - generic [ref=e6]: A
+    - generic [ref=e7]: R
+    - generic [ref=e8]: "Y"
+    - generic [ref=e9]: A
+    - generic [ref=e10]: "N"
+    - generic [ref=e11]: T
+    - generic [ref=e12]: I
+  - generic [ref=e15]:
+    - banner [ref=e16]:
+      - generic [ref=e17]:
+        - link "HARYANTI" [ref=e18] [cursor=pointer]:
+          - /url: /
+        - navigation [ref=e19]:
+          - link "Projects" [ref=e20] [cursor=pointer]:
+            - /url: /projects
+          - link "About" [ref=e21] [cursor=pointer]:
+            - /url: /about
+          - link "Contact" [ref=e22] [cursor=pointer]:
+            - /url: /contact
+        - link "Let's Talk" [ref=e23] [cursor=pointer]:
+          - /url: /contact
+    - main [ref=e24]:
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - heading "Hello, I'm Haryanti" [level=1] [ref=e33]
+            - generic [ref=e34]:
+              - generic [ref=e36]:
+                - heading "Graphic Designer" [level=3] [ref=e37]
+                - paragraph [ref=e38]: Transforming ideas into stunning visual experiences
+              - generic [ref=e42]: Image 1
+              - generic [ref=e44]:
+                - heading "Content Creator" [level=3] [ref=e45]
+                - paragraph [ref=e46]: Crafting engaging stories that resonate with audiences
+          - generic [ref=e48]:
+            - heading "Creating Visual Stories" [level=1] [ref=e50]
+            - generic [ref=e51]:
+              - generic [ref=e53]:
+                - heading "Brand Identity" [level=3] [ref=e54]
+                - paragraph [ref=e55]: Building memorable brands that stand out
+              - generic [ref=e59]: Image 2
+              - generic [ref=e61]:
+                - heading "Digital Design" [level=3] [ref=e62]
+                - paragraph [ref=e63]: Modern aesthetics for the digital age
+          - generic [ref=e65]:
+            - heading "Bringing Ideas to Life" [level=1] [ref=e67]
+            - generic [ref=e68]:
+              - generic [ref=e70]:
+                - heading "Creative Vision" [level=3] [ref=e71]
+                - paragraph [ref=e72]: Where imagination meets execution
+              - generic [ref=e76]: Image 3
+              - generic [ref=e78]:
+                - heading "Passion Driven" [level=3] [ref=e79]
+                - paragraph [ref=e80]: Every project is a labor of love
+          - generic [ref=e82]:
+            - heading "Let's Work Together" [level=1] [ref=e84]
+            - generic [ref=e85]:
+              - generic [ref=e87]:
+                - heading "Start Your Project" [level=3] [ref=e88]
+                - paragraph [ref=e89]: Ready to bring your vision to reality
+              - generic [ref=e93]: Image 4
+              - generic [ref=e95]:
+                - heading "Get In Touch" [level=3] [ref=e96]
+                - paragraph [ref=e97]: Let's create something amazing together
+        - generic [ref=e100]: Scroll
+      - generic [ref=e103]:
+        - generic [ref=e104]:
+          - heading "Featured Work" [level=2] [ref=e105]
+          - paragraph [ref=e106]: Selected projects from my portfolio
+        - generic [ref=e107]:
+          - link "Project 1 Brand Design" [ref=e108] [cursor=pointer]:
+            - /url: /projects/project-1
+            - heading "Project 1" [level=3] [ref=e111]
+            - paragraph [ref=e112]: Brand Design
+          - link "Project 2 UI/UX App" [ref=e113] [cursor=pointer]:
+            - /url: /projects/project-2
+            - heading "Project 2" [level=3] [ref=e116]
+            - paragraph [ref=e117]: UI/UX App
+          - link "Project 3 Social Media" [ref=e118] [cursor=pointer]:
+            - /url: /projects/project-3
+            - heading "Project 3" [level=3] [ref=e121]
+            - paragraph [ref=e122]: Social Media
+          - link "Project 4 Packaging" [ref=e123] [cursor=pointer]:
+            - /url: /projects/project-4
+            - heading "Project 4" [level=3] [ref=e126]
+            - paragraph [ref=e127]: Packaging
+        - link "View All Projects →" [ref=e129] [cursor=pointer]:
+          - /url: /projects
+          - text: View All Projects
+          - generic [ref=e130]: →
+      - generic [ref=e131]:
+        - heading "Skills & Expertise" [level=2] [ref=e132]
+        - generic [ref=e133]:
+          - generic [ref=e134]:
+            - heading "Hard Skills" [level=3] [ref=e135]
+            - generic [ref=e136]:
+              - generic [ref=e137]:
+                - generic [ref=e138]: 🎨
+                - generic [ref=e139]: Adobe PS
+              - generic [ref=e140]:
+                - generic [ref=e141]: 🖌️
+                - generic [ref=e142]: Figma
+              - generic [ref=e143]:
+                - generic [ref=e144]: ✏️
+                - generic [ref=e145]: Adobe AI
+              - generic [ref=e146]:
+                - generic [ref=e147]: 📐
+                - generic [ref=e148]: Canva Pro
+              - generic [ref=e149]:
+                - generic [ref=e150]: 🎬
+                - generic [ref=e151]: After Effects
+              - generic [ref=e152]:
+                - generic [ref=e153]: 🎭
+                - generic [ref=e154]: Blender
+          - generic [ref=e155]:
+            - heading "Soft Skills" [level=3] [ref=e156]
+            - generic [ref=e157]:
+              - generic [ref=e158]:
+                - generic [ref=e159]: 🎯
+                - generic [ref=e160]:
+                  - heading "Communication" [level=4] [ref=e161]
+                  - paragraph [ref=e162]: Clear & effective communication with clients and teams
+              - generic [ref=e163]:
+                - generic [ref=e164]: 💡
+                - generic [ref=e165]:
+                  - heading "Problem Solving" [level=4] [ref=e166]
+                  - paragraph [ref=e167]: Creative solutions for complex design challenges
+              - generic [ref=e168]:
+                - generic [ref=e169]: ⏰
+                - generic [ref=e170]:
+                  - heading "Time Management" [level=4] [ref=e171]
+                  - paragraph [ref=e172]: Efficient workflow and deadline management
+              - generic [ref=e173]:
+                - generic [ref=e174]: 🤝
+                - generic [ref=e175]:
+                  - heading "Collaboration" [level=4] [ref=e176]
+                  - paragraph [ref=e177]: Seamless teamwork in cross-functional projects
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - heading "What I Can Do For You" [level=2] [ref=e180]
+          - paragraph [ref=e181]: Specialized services tailored to your needs
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - generic [ref=e184]: 🎨
+            - heading "Brand Design" [level=3] [ref=e185]
+            - paragraph [ref=e186]: Logo design, visual identity, brand guidelines, and complete branding solutions for businesses.
+          - generic [ref=e187]:
+            - generic [ref=e188]: 📱
+            - heading "UI/UX Design" [level=3] [ref=e189]
+            - paragraph [ref=e190]: User interface and experience design for web and mobile applications with focus on usability.
+          - generic [ref=e191]:
+            - generic [ref=e192]: 📸
+            - heading "Content Creator" [level=3] [ref=e193]
+            - paragraph [ref=e194]: Social media content, marketing materials, and visual storytelling for digital platforms.
+      - generic [ref=e196]:
+        - generic [ref=e198]:
+          - generic [ref=e200]:
+            - generic [ref=e202]: "2022"
+            - generic [ref=e203]: Senior
+          - generic [ref=e206]:
+            - generic [ref=e208]: "2021"
+            - generic [ref=e209]: Graphic
+          - generic [ref=e212]:
+            - generic [ref=e214]: "2020"
+            - generic [ref=e215]: Junior
+        - generic [ref=e216]:
+          - generic [ref=e219]:
+            - generic [ref=e220]:
+              - generic [ref=e221]: 🏢
+              - generic [ref=e222]: PT. Creative Studio
+            - heading "Senior Graphic Designer" [level=3] [ref=e223]
+            - paragraph [ref=e224]: 2022 - Present
+            - list [ref=e225]:
+              - listitem [ref=e226]:
+                - generic [ref=e227]: •
+                - generic [ref=e228]: Lead brand identity projects for major clients
+              - listitem [ref=e229]:
+                - generic [ref=e230]: •
+                - generic [ref=e231]: Mentor junior designers and review their work
+              - listitem [ref=e232]:
+                - generic [ref=e233]: •
+                - generic [ref=e234]: Client presentation & pitching
+          - generic [ref=e237]:
+            - generic [ref=e238]:
+              - generic [ref=e239]: 🎯
+              - generic [ref=e240]: Digital Agency XYZ
+            - heading "Graphic Designer" [level=3] [ref=e241]
+            - paragraph [ref=e242]: 2021 - 2022
+            - list [ref=e243]:
+              - listitem [ref=e244]:
+                - generic [ref=e245]: •
+                - generic [ref=e246]: Created visual content for social media campaigns
+              - listitem [ref=e247]:
+                - generic [ref=e248]: •
+                - generic [ref=e249]: Designed marketing materials and brand assets
+              - listitem [ref=e250]:
+                - generic [ref=e251]: •
+                - generic [ref=e252]: Collaborated with marketing team on strategies
+          - generic [ref=e255]:
+            - generic [ref=e256]:
+              - generic [ref=e257]: 🚀
+              - generic [ref=e258]: Startup Inc.
+            - heading "Junior Designer" [level=3] [ref=e259]
+            - paragraph [ref=e260]: 2020 - 2021
+            - list [ref=e261]:
+              - listitem [ref=e262]:
+                - generic [ref=e263]: •
+                - generic [ref=e264]: Assisted in creating UI/UX designs
+              - listitem [ref=e265]:
+                - generic [ref=e266]: •
+                - generic [ref=e267]: Produced graphics for web and mobile apps
+              - listitem [ref=e268]:
+                - generic [ref=e269]: •
+                - generic [ref=e270]: Learned industry best practices
+      - generic [ref=e272]:
+        - heading "Have a project in mind?" [level=2] [ref=e273]
+        - paragraph [ref=e274]: Let's create something amazing together. I'm always excited to work on new and challenging projects.
+        - link "Let's Talk ✨" [ref=e275] [cursor=pointer]:
+          - /url: /contact
+    - contentinfo [ref=e276]:
+      - generic [ref=e278]:
+        - paragraph [ref=e279]: © 2025 Haryanti. All rights reserved.
+        - link "📄 Download Resume" [ref=e280] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e281]: 📄
+          - generic [ref=e282]: Download Resume
+        - generic [ref=e283]:
+          - link "LinkedIn" [ref=e284] [cursor=pointer]:
+            - /url: "#"
+            - text: Li
+          - link "Instagram" [ref=e285] [cursor=pointer]:
+            - /url: "#"
+            - text: Ig
+          - link "Spotify" [ref=e286] [cursor=pointer]:
+            - /url: "#"
+            - text: Sp
+          - link "Email" [ref=e287] [cursor=pointer]:
+            - /url: mailto:hello@haryanti.com
+            - text: Em
+```

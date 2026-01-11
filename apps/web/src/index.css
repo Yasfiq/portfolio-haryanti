@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #f37430;
+    --secondary: #754c45;
+    --tertiary: #402e32;
+    --foreground: #1a1a1a;
+    --muted: #6b5b57;
+    --background: #ffffff;
+
+    /* Golden Ratio Spacing */
+    --space-1: 4px;
+    --space-2: 6px;
+    --space-3: 10px;
+    --space-4: 16px;
+    --space-5: 26px;
+    --space-6: 42px;
+    --space-7: 68px;
+    --space-8: 110px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Quicksand', system-ui, sans-serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Smooth scroll disabled when using Lenis */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
+  /* Hide scrollbar but allow scrolling */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f5f5f5;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #d5c0b9;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+}
+
+@layer components {
+
+  /* Magnetic Button */
+  .magnetic-btn {
+    @apply relative inline-flex items-center justify-center;
+    @apply px-golden-6 py-golden-4;
+    @apply bg-primary text-white font-semibold;
+    @apply rounded-full overflow-hidden;
+    @apply transition-all duration-300 ease-smooth;
+  }
+
+  .magnetic-btn:hover {
+    @apply bg-primary/90;
+  }
+
+  .magnetic-btn::before {
+    content: '';
+    @apply absolute inset-0 bg-white/10;
+    @apply scale-0 rounded-full;
+    @apply transition-transform duration-300 ease-smooth;
+  }
+
+  .magnetic-btn:hover::before {
+    @apply scale-100;
+  }
+
+  /* Section Container */
+  .section-container {
+    @apply w-full min-h-screen;
+    @apply px-golden-5 md:px-golden-6 lg:px-golden-7;
+    @apply py-golden-7 md:py-golden-8;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-white backdrop-blur-sm;
+    @apply border border-secondary/20;
+    @apply rounded-2xl p-golden-5;
+    @apply shadow-sm;
+    @apply transition-all duration-300 ease-smooth;
+  }
+
+  .card:hover {
+    @apply border-primary/40;
+    @apply shadow-lg shadow-primary/20;
+  }
+
+  /* Glassmorphism */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl;
+    @apply border border-secondary/10;
+    @apply shadow-sm;
+  }
+
+  /* Text Gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-secondary;
+    @apply bg-clip-text text-transparent;
+  }
+
+  /* Floating Orb */
+  .floating-orb {
+    @apply absolute rounded-full;
+    @apply bg-primary/20 blur-xl;
+    @apply animate-float;
+  }
+}
+
+@layer utilities {
+
+  /* Smooth Scroll Container for Horizontal Scroll */
+  .horizontal-scroll-container {
+    @apply flex overflow-x-auto snap-x snap-mandatory;
+    @apply scrollbar-hide;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .horizontal-scroll-container>* {
+    @apply flex-shrink-0 snap-center;
+  }
+
+  /* Hide Scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Full Page Section */
+  .full-page {
+    @apply w-screen h-screen flex-shrink-0;
+  }
+
+  /* Text rotation for hero side text */
+  .rotate-text-left {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .rotate-text-right {
+    writing-mode: vertical-rl;
+  }
+
+  /* GSAP Pin fix for Hero - position below navbar */
+  .pin-spacer>div {
+    top: 80px !important;
+  }
+}
