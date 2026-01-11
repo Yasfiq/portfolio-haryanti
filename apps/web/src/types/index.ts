@@ -105,14 +105,33 @@ export interface Experience {
 }
 
 // ============ Hero Slides ============
+export type HeroTemplate = 'classic' | 'fun';
+
+export interface ClassicSchemaContent {
+    title: string;
+    leftTitle?: string;
+    leftSubtitle?: string;
+    rightTitle?: string;
+    rightSubtitle?: string;
+    imageUrl: string;
+}
+
+export interface FunSchemaContent {
+    greeting: string;
+    name?: string;
+    role?: string;
+    quotes: string;
+    experience: string;
+    imageUrl: string;
+}
+
+export type HeroSchemaContent = ClassicSchemaContent | FunSchemaContent;
+
 export interface HeroSlide {
     id: string;
     title: string;
-    leftTitle: string;
-    leftSubtitle: string;
-    rightTitle: string;
-    rightSubtitle: string;
-    imageUrl?: string;
+    template: HeroTemplate;
+    schema: HeroSchemaContent;
     backgroundColor?: string;
     backgroundFrom?: string;
     backgroundTo?: string;

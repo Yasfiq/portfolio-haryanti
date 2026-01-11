@@ -106,7 +106,7 @@ export default function Dashboard() {
                             data.recentMessages.map((msg: RecentMessage) => (
                                 <div
                                     key={msg.id}
-                                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-cms-bg-hover transition-colors cursor-pointer"
+                                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-cms-bg-hover transition-colors"
                                 >
                                     <div className={`w-2 h-2 rounded-full mt-2 ${msg.isRead ? 'bg-cms-text-muted' : 'bg-cms-accent'}`} />
                                     <div className="flex-1 min-w-0">

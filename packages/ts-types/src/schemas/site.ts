@@ -1,28 +1,5 @@
 import { z } from 'zod';
 
-// HeroSlide Schema
-export const HeroSlideSchema = z.object({
-    id: z.string().uuid(),
-    title: z.string().min(1, 'Title is required'),
-    leftTitle: z.string().min(1, 'Left title is required'),
-    leftSubtitle: z.string().min(1, 'Left subtitle is required'),
-    rightTitle: z.string().min(1, 'Right title is required'),
-    rightSubtitle: z.string().min(1, 'Right subtitle is required'),
-    imageUrl: z.string().url().nullable(),
-    backgroundColor: z.string().nullable(), // Optional solid background color
-    backgroundFrom: z.string().nullable(), // Optional gradient start color
-    backgroundTo: z.string().nullable(), // Optional gradient end color
-    order: z.number().int().default(0),
-    isVisible: z.boolean().default(true),
-});
-
-export const CreateHeroSlideSchema = HeroSlideSchema.omit({ id: true });
-export const UpdateHeroSlideSchema = CreateHeroSlideSchema.partial();
-
-export type HeroSlide = z.infer<typeof HeroSlideSchema>;
-export type CreateHeroSlideInput = z.infer<typeof CreateHeroSlideSchema>;
-export type UpdateHeroSlideInput = z.infer<typeof UpdateHeroSlideSchema>;
-
 // SiteSettings Schema
 export const SiteSettingsSchema = z.object({
     id: z.string().uuid(),

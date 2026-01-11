@@ -89,3 +89,23 @@ export function useDeleteMessage() {
         },
     });
 }
+
+/**
+ * Hook to get unread message count for notification badge
+ * Uses derived data from messages list with efficient polling
+ */
+export function useUnreadMessageCount() {
+    const { data: messages, isLoading, isError } = useQuery({
+        queryKey: [...messageKeys.list(), 'unreadCount'],
+        queryFn: fetchMessages,
+        staleTime: 30 * 1000, // 30 seconds
+        refetchInterval: 60 * 1000, // Poll every 60 seconds for real-time updates
+        select: (messages) => messages.filter((msg) => !msg.isRead).length,
+    });
+
+    return {
+        count: messages ?? 0,
+        isLoading,
+        isError,
+    };
+}
