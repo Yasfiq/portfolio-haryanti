@@ -27,15 +27,26 @@ RUN pnpm --filter @repo/database exec prisma generate
 RUN pnpm --filter @repo/database build
 RUN pnpm --filter @portfolio/api build
 
+# Prune dev dependencies for production
+RUN pnpm prune --prod
+
 # Production stage
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Copy only necessary files
-COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/package.json ./
+# Copy the entire app with pruned node_modules
+COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/package.json ./apps/api/
+COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=builder /app/packages/database/dist ./packages/database/dist
+COPY --from=builder /app/packages/database/package.json ./packages/database/
+COPY --from=builder /app/packages/database/node_modules ./packages/database/node_modules
+
+# Set working directory to api
+WORKDIR /app/apps/api
 
 ENV NODE_ENV=production
 ENV PORT=3000
