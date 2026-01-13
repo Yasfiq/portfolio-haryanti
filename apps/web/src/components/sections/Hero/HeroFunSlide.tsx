@@ -3,12 +3,12 @@ import gsap from 'gsap';
 import { useSettings } from '../../../hooks/useSettings';
 
 interface HeroFunSlideProps {
-    greeting: string;
+    greeting?: string;
     name?: string;
     role?: string;
-    quotes: string;
-    experience: string;
-    imageUrl: string;
+    quotes?: string;
+    experience?: string;
+    imageUrl?: string;
     backgroundColor?: string;
     backgroundFrom?: string;
     backgroundTo?: string;
