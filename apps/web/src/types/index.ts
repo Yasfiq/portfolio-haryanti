@@ -143,6 +143,27 @@ export interface HeroSlide {
     template: string;
 }
 
+// Hero Template Schema Types
+export interface ClassicSchemaContent {
+    [key: string]: unknown;
+    title?: string;
+    leftTitle?: string;
+    leftSubtitle?: string;
+    rightTitle?: string;
+    rightSubtitle?: string;
+    imageUrl?: string;
+}
+
+export interface FunSchemaContent {
+    [key: string]: unknown;
+    greeting?: string;
+    name?: string;
+    role?: string;
+    quotes?: string;
+    experience?: string;
+    imageUrl?: string;
+}
+
 // ============ Site Settings ============
 export interface SiteSettings {
     id: string;
