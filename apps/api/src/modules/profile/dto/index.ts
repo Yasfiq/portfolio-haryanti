@@ -1,13 +1,13 @@
-import { IsString, IsOptional, IsEmail, IsDateString, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsBoolean, IsNumber } from 'class-validator';
 
 export class UpdateProfileDto {
     @IsOptional()
     @IsString()
-    fullName?: string;
+    name?: string;
 
     @IsOptional()
     @IsString()
-    title?: string;
+    tagline?: string;
 
     @IsOptional()
     @IsString()
@@ -15,7 +15,11 @@ export class UpdateProfileDto {
 
     @IsOptional()
     @IsString()
-    avatarUrl?: string;
+    profileImageUrl?: string;
+
+    @IsOptional()
+    @IsString()
+    heroImageUrl?: string;
 
     @IsOptional()
     @IsString()
@@ -27,6 +31,10 @@ export class UpdateProfileDto {
 
     @IsOptional()
     @IsString()
+    footerText?: string;
+
+    @IsOptional()
+    @IsString()
     linkedinUrl?: string;
 
     @IsOptional()
@@ -35,47 +43,70 @@ export class UpdateProfileDto {
 
     @IsOptional()
     @IsString()
+    tiktokUrl?: string;
+
+    @IsOptional()
+    @IsString()
     pinterestUrl?: string;
+
+    @IsOptional()
+    @IsString()
+    youtubeUrl?: string;
 }
 
 export class CreateEducationDto {
     @IsString()
-    schoolName: string;
+    degree: string;
 
-    @IsOptional()
     @IsString()
-    degree?: string;
+    institution: string;
 
-    @IsDateString()
-    startDate: string;
+    @IsNumber()
+    startYear: number;
 
     @IsOptional()
-    @IsDateString()
-    endDate?: string;
+    @IsNumber()
+    endYear?: number;
 
     @IsOptional()
     @IsBoolean()
     isCurrent?: boolean;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
+
+    @IsOptional()
+    @IsNumber()
+    order?: number;
 }
 
 export class UpdateEducationDto {
     @IsOptional()
     @IsString()
-    schoolName?: string;
-
-    @IsOptional()
-    @IsString()
     degree?: string;
 
     @IsOptional()
-    @IsDateString()
-    startDate?: string;
+    @IsString()
+    institution?: string;
 
     @IsOptional()
-    @IsDateString()
-    endDate?: string;
+    @IsNumber()
+    startYear?: number;
+
+    @IsOptional()
+    @IsNumber()
+    endYear?: number;
 
     @IsOptional()
     @IsBoolean()
     isCurrent?: boolean;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
+
+    @IsOptional()
+    @IsNumber()
+    order?: number;
 }

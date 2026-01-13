@@ -12,8 +12,6 @@ import { HealthModule } from './modules/health';
 import { EmailModule } from './modules/email';
 import { DashboardModule } from './modules/dashboard';
 import { MessagesModule } from './modules/messages';
-import { ProjectsModule } from './modules/projects';
-import { CategoriesModule } from './modules/categories';
 import { ClientsModule } from './modules/clients/clients.module';
 import { ProfileModule } from './modules/profile';
 import { SkillsModule } from './modules/skills';
@@ -45,8 +43,6 @@ import { UploadModule } from './modules/upload';
     EmailModule,
     DashboardModule,
     MessagesModule,
-    ProjectsModule,
-    CategoriesModule,
     ClientsModule,
     ProfileModule,
     SkillsModule,

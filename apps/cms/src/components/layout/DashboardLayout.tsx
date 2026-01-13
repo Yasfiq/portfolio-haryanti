@@ -7,9 +7,9 @@ const pageTitles: Record<string, string> = {
     '/': 'Dashboard',
     '/profile': 'Profile',
     '/hero-slides': 'Hero Slides',
-    '/projects': 'Projects',
-    '/projects/new': 'New Project',
-    '/categories': 'Categories',
+    '/portfolios': 'Portfolios',
+    '/portfolios/new': 'New Portfolio',
+    '/clients': 'Clients',
     '/experience': 'Experience',
     '/experience/new': 'New Experience',
     '/skills': 'Skills',
@@ -29,9 +29,9 @@ export default function DashboardLayout() {
         if (pageTitles[location.pathname]) {
             return pageTitles[location.pathname];
         }
-        // Check for project edit
-        if (location.pathname.startsWith('/projects/') && location.pathname !== '/projects/new') {
-            return 'Edit Project';
+        // Check for portfolio edit
+        if (location.pathname.startsWith('/portfolios/') && location.pathname !== '/portfolios/new') {
+            return 'Edit Portfolio';
         }
         return 'Dashboard';
     };

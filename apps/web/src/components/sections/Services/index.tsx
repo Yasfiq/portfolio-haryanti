@@ -29,29 +29,31 @@ const Services = () => {
     ];
 
     useEffect(() => {
-        const cards = cardsRef.current?.querySelectorAll('.service-card');
-        if (!cards) return;
+        const cardsContainer = cardsRef.current;
+        if (!cardsContainer) return;
 
-        gsap.fromTo(
-            cards,
-            { y: 40, opacity: 0, scale: 0.95 },
-            {
-                y: 0,
-                opacity: 1,
-                scale: 1,
-                duration: 0.7,
-                stagger: 0.15,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: cardsRef.current,
-                    start: 'top 75%',
-                },
-            }
-        );
+        // Use gsap.context for proper cleanup scoping
+        const ctx = gsap.context(() => {
+            const cards = cardsContainer.querySelectorAll('.service-card');
+            gsap.fromTo(
+                cards,
+                { y: 40, opacity: 0, scale: 0.95 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.7,
+                    stagger: 0.15,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: cardsContainer,
+                        start: 'top 75%',
+                    },
+                }
+            );
+        }, cardsContainer);
 
-        return () => {
-            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-        };
+        return () => ctx.revert(); // Properly cleanup only this component's animations
     }, []);
 
     return (

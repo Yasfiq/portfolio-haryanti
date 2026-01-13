@@ -9,7 +9,7 @@ export class ProfileService {
         const profile = await prisma.profile.findFirst({
             include: {
                 educations: {
-                    orderBy: { startDate: 'desc' },
+                    orderBy: { order: 'asc' },
                 },
             },
         });
@@ -32,8 +32,8 @@ export class ProfileService {
         // Create new profile
         return prisma.profile.create({
             data: {
-                fullName: updateProfileDto.fullName || '',
-                title: updateProfileDto.title || '',
+                name: updateProfileDto.name || '',
+                tagline: updateProfileDto.tagline || '',
                 bio: updateProfileDto.bio || '',
                 email: updateProfileDto.email || '',
                 ...updateProfileDto,
@@ -44,7 +44,7 @@ export class ProfileService {
 
     async getEducations() {
         return prisma.education.findMany({
-            orderBy: { startDate: 'desc' },
+            orderBy: { order: 'asc' },
         });
     }
 
@@ -54,19 +54,15 @@ export class ProfileService {
             throw new NotFoundException('Profile not found. Create profile first.');
         }
 
-        let formattedEndDate = createEducationDto.endDate
-
-        if (formattedEndDate) {
-            const currentEndDate = new Date(formattedEndDate);
-            currentEndDate.setUTCHours(23, 59, 59, 999);
-            formattedEndDate = currentEndDate.toISOString();
-        }
-
         return prisma.education.create({
             data: {
-                ...createEducationDto,
-                startDate: new Date(createEducationDto.startDate).toISOString(),
-                endDate: formattedEndDate,
+                degree: createEducationDto.degree,
+                institution: createEducationDto.institution,
+                startYear: createEducationDto.startYear,
+                endYear: createEducationDto.endYear,
+                isCurrent: createEducationDto.isCurrent ?? false,
+                description: createEducationDto.description,
+                order: createEducationDto.order ?? 0,
                 profileId: profile.id,
             },
         });
@@ -80,11 +76,7 @@ export class ProfileService {
 
         return prisma.education.update({
             where: { id },
-            data: {
-                ...updateEducationDto,
-                startDate: updateEducationDto.startDate ? new Date(updateEducationDto.startDate).toISOString() : updateEducationDto.startDate,
-                endDate: updateEducationDto.endDate ? new Date(updateEducationDto.endDate).toISOString() : updateEducationDto.endDate,
-            },
+            data: updateEducationDto,
         });
     }
 

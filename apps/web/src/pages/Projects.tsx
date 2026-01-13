@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useProjects } from '../hooks/useProjects';
 import { useCategories } from '../hooks/useCategories';
-import type { Project } from '../types';
+import type { Client } from '../types';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,21 +13,21 @@ const Projects = () => {
     const [activeCategory, setActiveCategory] = useState<string | null>(null); // null = All
     const gridRef = useRef<HTMLDivElement>(null);
 
-    // Fetch data from API
-    const { data: projects = [], isLoading: projectsLoading } = useProjects();
+    // Fetch data from API (now uses /clients endpoints)
+    const { data: clients = [], isLoading: clientsLoading } = useProjects();
     const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
-    // Filter projects by category
-    const filteredProjects = useMemo(() => {
-        if (!activeCategory) return projects;
-        return projects.filter(
-            (project) => project.category?.id === activeCategory
+    // Filter clients by category (check if any of client's categories match)
+    const filteredClients = useMemo(() => {
+        if (!activeCategory) return clients;
+        return clients.filter((client) =>
+            client.categories?.some((cat) => cat.id === activeCategory)
         );
-    }, [projects, activeCategory]);
+    }, [clients, activeCategory]);
 
     // Animation on filter change
     useEffect(() => {
-        if (!gridRef.current || projectsLoading) return;
+        if (!gridRef.current || clientsLoading) return;
 
         const cards = gridRef.current.querySelectorAll('.project-card');
         gsap.fromTo(
@@ -41,9 +41,9 @@ const Projects = () => {
                 ease: 'power2.out',
             }
         );
-    }, [filteredProjects, projectsLoading]);
+    }, [filteredClients, clientsLoading]);
 
-    const isLoading = projectsLoading || categoriesLoading;
+    const isLoading = clientsLoading || categoriesLoading;
 
     return (
         <>
@@ -120,7 +120,7 @@ const Projects = () => {
                                 <div className="w-full h-full bg-secondary/20 rounded-lg" />
                             </div>
                         ))
-                    ) : filteredProjects.length === 0 ? (
+                    ) : filteredClients.length === 0 ? (
                         // Empty state
                         <div className="col-span-full text-center py-golden-7">
                             <p className="text-muted text-lg">
@@ -129,8 +129,8 @@ const Projects = () => {
                         </div>
                     ) : (
                         // Project cards
-                        filteredProjects.map((project) => (
-                            <ProjectCard key={project.id} project={project} />
+                        filteredClients.map((client) => (
+                            <ProjectCard key={client.id} client={client} />
                         ))
                     )}
                 </div>
@@ -140,17 +140,18 @@ const Projects = () => {
 };
 
 // Separate component for better performance with masonry layout
-const ProjectCard = ({ project }: { project: Project }) => {
+const ProjectCard = ({ client }: { client: Client }) => {
     return (
         <Link
-            to={`/projects/${project.slug}`}
+            to={`/projects/${client.slug}`}
             className="project-card card group cursor-pointer mb-golden-5 break-inside-avoid block"
         >
-            <div className="bg-secondary/20 rounded-lg overflow-hidden">
-                {project.thumbnailUrl ? (
+            {/* Thumbnail/Cover */}
+            <div className="relative bg-secondary/20 rounded-lg overflow-hidden">
+                {client.thumbnailUrl ? (
                     <img
-                        src={project.thumbnailUrl}
-                        alt={project.title}
+                        src={client.thumbnailUrl}
+                        alt={client.name}
                         className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                     />
@@ -158,14 +159,26 @@ const ProjectCard = ({ project }: { project: Project }) => {
                     <div className="aspect-[4/3] w-full bg-gradient-to-br from-primary/20 to-secondary/20 group-hover:scale-105 transition-transform duration-500" />
                 )}
             </div>
-            <div className="pt-golden-4">
-                <h3 className="text-lg font-semibold mb-golden-2 group-hover:text-primary transition-colors">
-                    {project.title}
-                </h3>
-                {/* Simplified: Only show summary, removed category/year per client request */}
-                <p className="text-muted text-sm line-clamp-2">
-                    {project.summary}
-                </p>
+
+            {/* Client Info */}
+            <div className="pt-golden-4 flex items-start gap-golden-3">
+                {/* Logo */}
+                {client.logoUrl && (
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden bg-secondary/20">
+                        <img
+                            src={client.logoUrl}
+                            alt={`${client.name} logo`}
+                            className="w-full h-full object-contain"
+                        />
+                    </div>
+                )}
+
+                {/* Name */}
+                <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold group-hover:text-primary transition-colors truncate">
+                        {client.name}
+                    </h3>
+                </div>
             </div>
         </Link>
     );

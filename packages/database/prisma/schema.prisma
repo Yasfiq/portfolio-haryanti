@@ -8,90 +8,96 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Admin {
   id        String   @id @default(uuid())
   email     String   @unique
+  name      String   @default("Admin")
   createdAt DateTime @default(now())
 }
 
 model Profile {
-  id           String      @id @default(uuid())
-  fullName     String
-  title        String
-  bio          String
-  avatarUrl    String?
-  resumeUrl    String?
-  email        String
-  linkedinUrl  String?
-  instagramUrl String?
-  updatedAt    DateTime    @updatedAt
-  pinterestUrl String?
-  educations   Education[]
+  id               String       @id @default(uuid())
+  name             String       @default("")
+  tagline          String?
+  bio              String?
+  profileImageUrl  String?
+  heroImageUrl     String?
+  email            String
+  resumeUrl        String?
+  footerText       String?
+  linkedinUrl      String?
+  instagramUrl     String?
+  tiktokUrl        String?
+  pinterestUrl     String?
+  youtubeUrl       String?
+  updatedAt        DateTime     @updatedAt
+  educations       Education[]
 }
 
 model Education {
-  id         String    @id @default(uuid())
-  schoolName String
-  degree     String?
-  startDate  DateTime
-  endDate    DateTime?
-  isCurrent  Boolean   @default(false)
-  profileId  String
-  profile    Profile   @relation(fields: [profileId], references: [id])
-}
-
-model Client {
   id          String    @id @default(uuid())
-  name        String
-  slug        String    @unique
-  logoUrl     String?
+  degree      String
+  institution String
+  startYear   Int
+  endYear     Int?
+  isCurrent   Boolean   @default(false)
   description String?
   order       Int       @default(0)
-  isVisible   Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  projects    Project[]
+  profileId   String
+  profile     Profile   @relation(fields: [profileId], references: [id])
 }
 
-model Project {
+// ===========================================
+// CLIENT MODULE (Client > Category > Gallery)
+// ===========================================
+
+model Client {
   id           String           @id @default(uuid())
-  title        String
+  name         String
   slug         String           @unique
-  projectDate  DateTime
-  summary      String
-  problem      String?
-  solution     String?
-  result       String?
-  thumbnailUrl String
-  videoUrl     String?
-  likesCount   Int              @default(0)
-  isVisible    Boolean          @default(false)
+  logoUrl      String?
+  thumbnailUrl String?
   order        Int              @default(0)
-  categoryId   String?
+  isVisible    Boolean          @default(true)
   createdAt    DateTime         @default(now())
-  clientId     String?
-  category     ProjectCategory? @relation(fields: [categoryId], references: [id])
-  client       Client?          @relation(fields: [clientId], references: [id])
-  gallery      ProjectImage[]
-  likes        ProjectLike[]
+  updatedAt    DateTime         @updatedAt
+  categories   ClientCategory[]
 }
 
-model ProjectImage {
-  id        String  @id @default(uuid())
-  url       String
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+model ClientCategory {
+  id       String          @id @default(uuid())
+  name     String
+  slug     String
+  clientId String
+  order    Int             @default(0)
+  client   Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  images   CategoryImage[]
+
+  @@unique([clientId, slug])
 }
 
-model ProjectLike {
-  id         String   @id @default(uuid())
-  projectId  String
-  userIpHash String
-  createdAt  DateTime @default(now())
-  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@unique([projectId, userIpHash])
+model CategoryImage {
+  id         String         @id @default(uuid())
+  url        String
+  categoryId String
+  order      Int            @default(0)
+  createdAt  DateTime       @default(now())
+  category   ClientCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
+
+// ===========================================
+// OTHER MODULES
+// ===========================================
 
 model Experience {
   id              String    @id @default(uuid())
@@ -127,6 +133,7 @@ model Service {
   description String
   iconUrl     String?
   order       Int     @default(0)
+  isVisible   Boolean @default(false)
 }
 
 model Message {
@@ -164,14 +171,6 @@ model SiteSettings {
   updatedAt      DateTime @updatedAt
   heroTemplate   String   @default("slides")
   whatsappNumber String?
-}
-
-model ProjectCategory {
-  id       String    @id @default(uuid())
-  name     String    @unique
-  slug     String    @unique
-  order    Int       @default(0)
-  projects Project[]
 }
 
 enum SkillCategory {

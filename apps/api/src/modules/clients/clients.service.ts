@@ -10,9 +10,13 @@ export class ClientsService {
             where: { isVisible: true },
             orderBy: { order: 'asc' },
             include: {
-                projects: {
-                    where: { isVisible: true },
-                    select: { id: true },
+                categories: {
+                    orderBy: { order: 'asc' },
+                    include: {
+                        _count: {
+                            select: { images: true },
+                        },
+                    },
                 },
             },
         });
@@ -23,24 +27,32 @@ export class ClientsService {
         return prisma.client.findMany({
             orderBy: { order: 'asc' },
             include: {
+                categories: {
+                    orderBy: { order: 'asc' },
+                    include: {
+                        _count: {
+                            select: { images: true },
+                        },
+                    },
+                },
                 _count: {
-                    select: { projects: true },
+                    select: { categories: true },
                 },
             },
         });
     }
 
-    // Get client by slug with projects
+    // Get client by slug with categories and images (gallery)
     async findBySlug(slug: string) {
         const client = await prisma.client.findUnique({
             where: { slug },
             include: {
-                projects: {
-                    where: { isVisible: true },
+                categories: {
                     orderBy: { order: 'asc' },
                     include: {
-                        category: true,
-                        gallery: true,
+                        images: {
+                            orderBy: { order: 'asc' },
+                        },
                     },
                 },
             },
@@ -53,15 +65,20 @@ export class ClientsService {
         return client;
     }
 
-    // Get client by ID
+    // Get client by ID with categories and images
     async findById(id: string) {
         const client = await prisma.client.findUnique({
             where: { id },
             include: {
-                projects: {
+                categories: {
                     orderBy: { order: 'asc' },
                     include: {
-                        category: true,
+                        images: {
+                            orderBy: { order: 'asc' },
+                        },
+                        _count: {
+                            select: { images: true },
+                        },
                     },
                 },
             },
@@ -128,22 +145,16 @@ export class ClientsService {
         });
     }
 
-    // Delete client
+    // Delete client (cascades to categories and images)
     async delete(id: string) {
         const client = await prisma.client.findUnique({
             where: { id },
-            include: { _count: { select: { projects: true } } },
+            include: { _count: { select: { categories: true } } },
         });
 
         if (!client) {
             throw new NotFoundException('Client not found');
         }
-
-        // Unlink projects from this client first
-        await prisma.project.updateMany({
-            where: { clientId: id },
-            data: { clientId: null },
-        });
 
         return prisma.client.delete({
             where: { id },
@@ -178,5 +189,139 @@ export class ClientsService {
         await prisma.$transaction(updates);
 
         return this.findAll();
+    }
+
+    // ========== Category Methods ==========
+
+    // Get all categories
+    async findAllCategories() {
+        return prisma.clientCategory.findMany({
+            orderBy: [{ client: { order: 'asc' } }, { order: 'asc' }],
+            include: {
+                client: true,
+                _count: { select: { images: true } },
+            },
+        });
+    }
+
+    // Get categories by client (with images for gallery)
+    async findCategoriesByClient(clientId: string) {
+        return prisma.clientCategory.findMany({
+            where: { clientId },
+            orderBy: { order: 'asc' },
+            include: {
+                images: {
+                    orderBy: { order: 'asc' },
+                },
+                _count: { select: { images: true } },
+            },
+        });
+    }
+
+    // Create category
+    async createCategory(clientId: string, name: string, slug: string) {
+        const client = await prisma.client.findUnique({ where: { id: clientId } });
+        if (!client) {
+            throw new NotFoundException('Client not found');
+        }
+
+        // Check slug uniqueness within client
+        const existing = await prisma.clientCategory.findUnique({
+            where: { clientId_slug: { clientId, slug } },
+        });
+        if (existing) {
+            throw new ConflictException('Category with this slug already exists for this client');
+        }
+
+        // Get max order
+        const maxOrder = await prisma.clientCategory.aggregate({
+            where: { clientId },
+            _max: { order: true },
+        });
+
+        return prisma.clientCategory.create({
+            data: {
+                name,
+                slug,
+                clientId,
+                order: (maxOrder._max.order ?? 0) + 1,
+            },
+        });
+    }
+
+    // Update category
+    async updateCategory(id: string, name: string, slug?: string) {
+        const category = await prisma.clientCategory.findUnique({ where: { id } });
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+
+        return prisma.clientCategory.update({
+            where: { id },
+            data: { name, ...(slug && { slug }) },
+        });
+    }
+
+    // Delete category
+    async deleteCategory(id: string) {
+        const category = await prisma.clientCategory.findUnique({ where: { id } });
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+
+        return prisma.clientCategory.delete({ where: { id } });
+    }
+
+    // ========== Gallery Image Methods ==========
+
+    // Add image to category
+    async addCategoryImage(categoryId: string, url: string) {
+        const category = await prisma.clientCategory.findUnique({ where: { id: categoryId } });
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+
+        // Get max order
+        const maxOrder = await prisma.categoryImage.aggregate({
+            where: { categoryId },
+            _max: { order: true },
+        });
+
+        return prisma.categoryImage.create({
+            data: {
+                url,
+                categoryId,
+                order: (maxOrder._max.order ?? 0) + 1,
+            },
+        });
+    }
+
+    // Remove images from category
+    async removeCategoryImages(categoryId: string, imageIds: string[]) {
+        await prisma.categoryImage.deleteMany({
+            where: {
+                id: { in: imageIds },
+                categoryId,
+            },
+        });
+
+        return { success: true };
+    }
+
+    // Reorder images in category
+    async reorderCategoryImages(categoryId: string, imageIds: string[]) {
+        const updates = imageIds.map((id, index) =>
+            prisma.categoryImage.update({
+                where: { id },
+                data: { order: index + 1 },
+            }),
+        );
+
+        await prisma.$transaction(updates);
+
+        return prisma.categoryImage.findMany({
+            where: { categoryId },
+            orderBy: { order: 'asc' },
+        });
     }
 }
