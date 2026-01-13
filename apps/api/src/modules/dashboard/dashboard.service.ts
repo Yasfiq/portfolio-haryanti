@@ -5,16 +5,16 @@ import { prisma } from '@repo/database';
 export class DashboardService {
     async getStats() {
         const [
-            totalProjects,
-            visibleProjects,
+            totalClients,
+            visibleClients,
             unreadMessages,
             totalMessages,
             skills,
             experiences,
             recentMessages,
         ] = await Promise.all([
-            prisma.project.count(),
-            prisma.project.count({ where: { isVisible: true } }),
+            prisma.client.count(),
+            prisma.client.count({ where: { isVisible: true } }),
             prisma.message.count({ where: { isRead: false } }),
             prisma.message.count(),
             prisma.skill.count(),
@@ -34,8 +34,8 @@ export class DashboardService {
         ]);
 
         return {
-            totalProjects,
-            visibleProjects,
+            totalProjects: totalClients,
+            visibleProjects: visibleClients,
             unreadMessages,
             totalMessages,
             skills,

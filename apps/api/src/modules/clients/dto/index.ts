@@ -13,6 +13,10 @@ export class CreateClientDto {
 
     @IsOptional()
     @IsString()
+    thumbnailUrl?: string;
+
+    @IsOptional()
+    @IsString()
     description?: string;
 
     @IsOptional()
@@ -36,6 +40,10 @@ export class UpdateClientDto {
     @IsOptional()
     @IsString()
     logoUrl?: string;
+
+    @IsOptional()
+    @IsString()
+    thumbnailUrl?: string;
 
     @IsOptional()
     @IsString()

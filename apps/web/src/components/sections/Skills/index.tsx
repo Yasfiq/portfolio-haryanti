@@ -15,7 +15,7 @@ const fallbackHardSkills: Skill[] = [
         shortName: 'Photoshop',
         gradientFrom: '#31A8FF',
         gradientTo: '#001E36',
-        category: 'hard',
+        category: 'HARD_SKILL',
         order: 0,
     },
     {
@@ -25,7 +25,7 @@ const fallbackHardSkills: Skill[] = [
         gradientFrom: '#F24E1E',
         gradientTo: '#1ABCFE',
         gradientVia: '#A259FF',
-        category: 'hard',
+        category: 'HARD_SKILL',
         order: 1,
     },
     {
@@ -34,7 +34,7 @@ const fallbackHardSkills: Skill[] = [
         shortName: 'Illustrator',
         gradientFrom: '#FF9A00',
         gradientTo: '#330000',
-        category: 'hard',
+        category: 'HARD_SKILL',
         order: 2,
     },
     {
@@ -43,17 +43,17 @@ const fallbackHardSkills: Skill[] = [
         shortName: 'Canva',
         gradientFrom: '#00C4CC',
         gradientTo: '#7B2FF7',
-        category: 'hard',
+        category: 'HARD_SKILL',
         order: 3,
     },
 ];
 
 // Fallback soft skills
 const fallbackSoftSkills: Skill[] = [
-    { id: '5', name: 'Communication', category: 'soft', order: 0 },
-    { id: '6', name: 'Problem Solving', category: 'soft', order: 1 },
-    { id: '7', name: 'Time Management', category: 'soft', order: 2 },
-    { id: '8', name: 'Collaboration', category: 'soft', order: 3 },
+    { id: '5', name: 'Communication', category: 'SOFT_SKILL', order: 0 },
+    { id: '6', name: 'Problem Solving', category: 'SOFT_SKILL', order: 1 },
+    { id: '7', name: 'Time Management', category: 'SOFT_SKILL', order: 2 },
+    { id: '8', name: 'Collaboration', category: 'SOFT_SKILL', order: 3 },
 ];
 
 // Default soft skill icons mapping
@@ -89,11 +89,11 @@ const Skills = () => {
         const skills = apiSkills && apiSkills.length > 0 ? apiSkills : [...fallbackHardSkills, ...fallbackSoftSkills];
 
         const hard = skills
-            .filter((s) => s.category === 'hard')
+            .filter((s) => s.category === 'HARD_SKILL')
             .sort((a, b) => a.order - b.order);
 
         const soft = skills
-            .filter((s) => s.category === 'soft')
+            .filter((s) => s.category === 'SOFT_SKILL')
             .sort((a, b) => a.order - b.order);
 
         return { hardSkills: hard.length > 0 ? hard : fallbackHardSkills, softSkills: soft.length > 0 ? soft : fallbackSoftSkills };

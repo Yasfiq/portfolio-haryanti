@@ -2,7 +2,6 @@ import { NavLink } from 'react-router-dom';
 import {
     LayoutDashboard,
     User,
-    FolderOpen,
     Briefcase,
     Lightbulb,
     GraduationCap,
@@ -12,7 +11,6 @@ import {
     LogOut,
     X,
     Layers,
-    Tag,
     Building,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
@@ -27,9 +25,7 @@ const navItems = [
     { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/profile', icon: User, label: 'Profile' },
     { path: '/hero-slides', icon: Layers, label: 'Hero Slides' },
-    { path: '/projects', icon: FolderOpen, label: 'Projects' },
-    { path: '/categories', icon: Tag, label: 'Categories' },
-    { path: '/clients', icon: Building, label: 'Clients' },
+    { path: '/clients', icon: Building, label: 'Clients / Projects' },
     { path: '/experience', icon: Briefcase, label: 'Experience' },
     { path: '/skills', icon: Lightbulb, label: 'Skills' },
     { path: '/education', icon: GraduationCap, label: 'Education', hidden: true }, // Temporarily hidden per client request

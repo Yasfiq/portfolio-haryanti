@@ -166,7 +166,7 @@ const Experience = () => {
                 ctxRef.current.revert();
             }
         };
-    }, [experiences.length]);
+    }, [experiences.length, containerRef.current]);
 
     // Get background style for a panel
     const getPanelBackground = (exp: ExperienceType) => {
@@ -236,7 +236,7 @@ const Experience = () => {
     );
 
     return (
-        <section ref={containerRef} className="relative w-full h-screen overflow-hidden">
+        <section ref={containerRef} className="relative w-full h-screen overflow-hidden" id="experience-horizontal-scroll">
             {/* Timeline - render in portal when pinned to avoid GSAP conflicts */}
             {isPinned
                 ? createPortal(<TimelineIndicator />, document.body)

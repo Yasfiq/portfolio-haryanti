@@ -11,9 +11,6 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import HeroSlides from './pages/HeroSlides';
-import Projects from './pages/Projects';
-import ProjectEdit from './pages/ProjectEdit';
-import Categories from './pages/Categories';
 import Clients from './pages/Clients';
 import Experience from './pages/Experience';
 import ExperienceEdit from './pages/ExperienceEdit';
@@ -123,10 +120,6 @@ function App() {
                                     <Route index element={<Dashboard />} />
                                     <Route path="profile" element={<Profile />} />
                                     <Route path="hero-slides" element={<HeroSlides />} />
-                                    <Route path="projects" element={<Projects />} />
-                                    <Route path="projects/new" element={<ProjectEdit />} />
-                                    <Route path="projects/:id" element={<ProjectEdit />} />
-                                    <Route path="categories" element={<Categories />} />
                                     <Route path="clients" element={<Clients />} />
                                     <Route path="experience" element={<Experience />} />
                                     <Route path="experience/new" element={<ExperienceEdit />} />
@@ -150,5 +143,3 @@ function App() {
 }
 
 export default App;
-
-
