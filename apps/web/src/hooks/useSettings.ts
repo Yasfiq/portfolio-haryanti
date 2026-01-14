@@ -7,6 +7,7 @@ import api from '../lib/api';
 export interface SiteSettings {
     id: string;
     siteName: string;
+    browserTitle: string | null;
     logoUrl: string | null;
     faviconUrl: string | null;
     primaryColor: string;
@@ -16,7 +17,6 @@ export interface SiteSettings {
     ctaDescription: string | null;
     ctaButtonText: string | null;
     whatsappNumber: string | null;
-    heroTemplate: 'slides' | 'modern';
     updatedAt: string;
 }
 

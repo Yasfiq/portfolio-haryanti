@@ -8,7 +8,7 @@ export default {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#f37430',
+                    DEFAULT: 'rgb(var(--primary-rgb) / <alpha-value>)',
                     50: '#fef5ee',
                     100: '#fce9d9',
                     200: '#f9cfb2',
@@ -21,7 +21,7 @@ export default {
                     900: '#782316',
                 },
                 secondary: {
-                    DEFAULT: '#754c45',
+                    DEFAULT: 'rgb(var(--secondary-rgb) / <alpha-value>)',
                     50: '#f9f6f5',
                     100: '#f2ebe9',
                     200: '#e7dad6',

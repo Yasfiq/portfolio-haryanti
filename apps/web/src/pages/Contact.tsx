@@ -81,7 +81,7 @@ const Contact = () => {
                                         value={formData.name}
                                         onChange={handleChange}
                                         required
-                                        className="w-full px-golden-4 py-golden-3 bg-tertiary/50 border border-secondary/30 rounded-lg text-foreground placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors"
+                                        className="w-full px-golden-4 py-golden-3 bg-gray-50 border border-gray-200 rounded-lg text-foreground placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                                         placeholder="Your name"
                                     />
                                 </div>
@@ -101,7 +101,7 @@ const Contact = () => {
                                         value={formData.email}
                                         onChange={handleChange}
                                         required
-                                        className="w-full px-golden-4 py-golden-3 bg-tertiary/50 border border-secondary/30 rounded-lg text-foreground placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors"
+                                        className="w-full px-golden-4 py-golden-3 bg-gray-50 border border-gray-200 rounded-lg text-foreground placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                                         placeholder="your@email.com"
                                     />
                                 </div>
@@ -121,7 +121,7 @@ const Contact = () => {
                                         onChange={handleChange}
                                         required
                                         rows={5}
-                                        className="w-full px-golden-4 py-golden-3 bg-tertiary/50 border border-secondary/30 rounded-lg text-foreground placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors resize-none"
+                                        className="w-full px-golden-4 py-golden-3 bg-gray-50 border border-gray-200 rounded-lg text-foreground placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
                                         placeholder="Tell me about your project..."
                                     />
                                 </div>

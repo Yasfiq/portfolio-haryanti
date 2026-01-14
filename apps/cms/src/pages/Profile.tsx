@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Save, Upload, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
+import { Save, Upload, ExternalLink, AlertCircle, Loader2, Lock, Eye, EyeOff } from 'lucide-react';
 import { UpdateProfileSchema, type UpdateProfileInput } from '@repo/ts-types';
 import { Card, CardHeader } from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -11,6 +11,7 @@ import { ProfileSkeleton } from '../components/skeletons/ProfileSkeleton';
 import { useProfile, useUpdateProfile } from '../hooks/useProfile';
 import { useUpload } from '../hooks/useUpload';
 import { useToastHelpers } from '../context/ToastContext';
+import { supabase } from '../lib/supabase';
 
 export default function Profile() {
     const { data: profile, isLoading, isError, error } = useProfile();
@@ -18,11 +19,19 @@ export default function Profile() {
     const toast = useToastHelpers();
 
     // Upload hooks
-    const { uploadAvatar, uploadResume, isUploading } = useUpload();
+    const { uploadResume, isUploading } = useUpload();
 
     // File input refs
-    const avatarInputRef = useRef<HTMLInputElement>(null);
     const resumeInputRef = useRef<HTMLInputElement>(null);
+
+    // Change Password state
+    const [passwordForm, setPasswordForm] = useState({
+        newPassword: '',
+        confirmPassword: '',
+    });
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
 
     const {
         register,
@@ -34,11 +43,9 @@ export default function Profile() {
     } = useForm<UpdateProfileInput>({
         resolver: zodResolver(UpdateProfileSchema),
         defaultValues: {
-            fullName: '',
             title: '',
             bio: '',
             email: '',
-            avatarUrl: null,
             resumeUrl: null,
             linkedinUrl: null,
             instagramUrl: null,
@@ -47,18 +54,15 @@ export default function Profile() {
     });
 
     // Watch for URL values
-    const avatarUrl = watch('avatarUrl');
     const resumeUrl = watch('resumeUrl');
 
     // Reset form when profile data is loaded
     useEffect(() => {
         if (profile) {
             reset({
-                fullName: profile.fullName ?? '',
                 title: profile.title ?? '',
                 bio: profile.bio ?? '',
                 email: profile.email ?? '',
-                avatarUrl: profile.avatarUrl,
                 resumeUrl: profile.resumeUrl,
                 linkedinUrl: profile.linkedinUrl,
                 instagramUrl: profile.instagramUrl,
@@ -77,23 +81,6 @@ export default function Profile() {
         }
     };
 
-    // Handle avatar upload
-    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const result = await uploadAvatar(file);
-        if (result) {
-            setValue('avatarUrl', result.url, { shouldDirty: true });
-            toast.success('Upload Berhasil', 'Avatar berhasil diupload');
-        }
-
-        // Reset input
-        if (avatarInputRef.current) {
-            avatarInputRef.current.value = '';
-        }
-    };
-
     // Handle resume upload
     const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -108,6 +95,39 @@ export default function Profile() {
         // Reset input
         if (resumeInputRef.current) {
             resumeInputRef.current.value = '';
+        }
+    };
+
+    // Handle change password
+    const handleChangePassword = async () => {
+        // Validation
+        if (passwordForm.newPassword.length < 6) {
+            toast.error('Validasi', 'Password minimal 6 karakter');
+            return;
+        }
+
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            toast.error('Validasi', 'Password tidak cocok');
+            return;
+        }
+
+        setIsChangingPassword(true);
+
+        try {
+            const { error } = await supabase.auth.updateUser({
+                password: passwordForm.newPassword,
+            });
+
+            if (error) {
+                toast.error('Error', error.message);
+            } else {
+                toast.success('Berhasil', 'Password berhasil diubah');
+                setPasswordForm({ newPassword: '', confirmPassword: '' });
+            }
+        } catch {
+            toast.error('Error', 'Terjadi kesalahan saat mengubah password');
+        } finally {
+            setIsChangingPassword(false);
         }
     };
 
@@ -143,70 +163,15 @@ export default function Profile() {
                 />
 
                 <div className="space-y-6">
-                    {/* Avatar */}
-                    <div>
-                        <label className="block text-sm font-medium text-cms-text-secondary mb-2">
-                            Avatar
-                        </label>
-                        <div className="flex items-center gap-4">
-                            <div className="w-20 h-20 rounded-full bg-cms-bg-secondary border border-cms-border flex items-center justify-center overflow-hidden">
-                                {avatarUrl ? (
-                                    <img
-                                        src={avatarUrl}
-                                        alt="Avatar"
-                                        className="w-full h-full rounded-full object-cover"
-                                    />
-                                ) : (
-                                    <span className="text-2xl font-bold text-cms-accent">
-                                        {profile?.fullName?.[0]?.toUpperCase() || 'H'}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <input
-                                    ref={avatarInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleAvatarUpload}
-                                    className="hidden"
-                                />
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={() => avatarInputRef.current?.click()}
-                                    disabled={isUploading}
-                                >
-                                    {isUploading ? (
-                                        <Loader2 size={16} className="animate-spin" />
-                                    ) : (
-                                        <Upload size={16} />
-                                    )}
-                                    {isUploading ? 'Uploading...' : 'Upload Photo'}
-                                </Button>
-                                {avatarUrl && (
-                                    <span className="text-xs text-cms-text-muted">
-                                        Photo uploaded ✓
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Input
-                            label="Full Name"
-                            placeholder="Your full name"
-                            error={errors.fullName?.message}
-                            {...register('fullName')}
-                        />
-                        <Input
-                            label="Title / Role"
-                            placeholder="e.g. Graphic Designer"
-                            error={errors.title?.message}
-                            {...register('title')}
-                        />
-                    </div>
+                    <Input
+                        label="Title / Role"
+                        placeholder="e.g. Graphic Designer & Content Creator"
+                        error={errors.title?.message}
+                        {...register('title')}
+                    />
+                    <p className="text-xs text-cms-text-muted -mt-4">
+                        Ditampilkan di Footer (di bawah nama site)
+                    </p>
 
                     <Textarea
                         label="Bio"
@@ -214,14 +179,20 @@ export default function Profile() {
                         error={errors.bio?.message}
                         {...register('bio')}
                     />
+                    <p className="text-xs text-cms-text-muted -mt-4">
+                        Ditampilkan di Footer (cuplikan max 120 karakter)
+                    </p>
 
                     <Input
-                        label="Email"
+                        label="Email Kontak"
                         type="email"
                         placeholder="your@email.com"
                         error={errors.email?.message}
                         {...register('email')}
                     />
+                    <p className="text-xs text-cms-text-muted -mt-4">
+                        Ditampilkan di Footer dan digunakan untuk Contact Form
+                    </p>
                 </div>
             </Card>
 
@@ -293,6 +264,74 @@ export default function Profile() {
                         error={errors.pinterestUrl?.message}
                         {...register('pinterestUrl')}
                     />
+                </div>
+            </Card>
+
+            {/* Account Security - Change Password */}
+            <Card>
+                <CardHeader
+                    title="Account Security"
+                    description="Ubah password akun CMS Anda"
+                />
+
+                <div className="space-y-4">
+                    {/* New Password */}
+                    <div>
+                        <label className="block text-sm font-medium text-cms-text-secondary mb-2">
+                            New Password
+                        </label>
+                        <div className="relative">
+                            <Input
+                                type={showNewPassword ? 'text' : 'password'}
+                                placeholder="Minimal 6 karakter"
+                                value={passwordForm.newPassword}
+                                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-cms-text-muted hover:text-cms-text-secondary"
+                            >
+                                {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div>
+                        <label className="block text-sm font-medium text-cms-text-secondary mb-2">
+                            Confirm New Password
+                        </label>
+                        <div className="relative">
+                            <Input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                placeholder="Masukkan ulang password baru"
+                                value={passwordForm.confirmPassword}
+                                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-cms-text-muted hover:text-cms-text-secondary"
+                            >
+                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Change Password Button */}
+                    <div className="pt-2">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={handleChangePassword}
+                            isLoading={isChangingPassword}
+                            disabled={!passwordForm.newPassword || !passwordForm.confirmPassword}
+                        >
+                            <Lock size={16} />
+                            Change Password
+                        </Button>
+                    </div>
                 </div>
             </Card>
 

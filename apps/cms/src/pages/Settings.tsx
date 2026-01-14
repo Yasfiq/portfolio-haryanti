@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, Upload, Palette, Monitor, Lock, Eye, EyeOff, MessageSquare, Megaphone, AlertCircle, RefreshCw, Loader2, Phone } from 'lucide-react';
+import { Save, Upload, Palette, Monitor, MessageSquare, AlertCircle, RefreshCw, Loader2, Phone } from 'lucide-react';
 import { Card, CardHeader } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -8,7 +8,6 @@ import { SettingsSkeleton } from '../components/skeletons/SettingsSkeleton';
 import { useSettings, useUpdateSettings } from '../hooks/useSettings';
 import { useUpload } from '../hooks/useUpload';
 import { useToastHelpers } from '../context/ToastContext';
-import { supabase } from '../lib/supabase';
 import type { UpdateSettingsInput } from '../types/settings.types';
 
 // Preset color themes
@@ -23,6 +22,7 @@ const colorPresets = [
 
 interface FormState {
     siteName: string;
+    browserTitle: string;
     logoUrl: string;
     faviconUrl: string;
     primaryColor: string;
@@ -32,11 +32,11 @@ interface FormState {
     ctaDescription: string;
     ctaButtonText: string;
     whatsappNumber: string;
-    heroTemplate: 'slides' | 'modern';
 }
 
 const defaultFormState: FormState = {
     siteName: '',
+    browserTitle: '',
     logoUrl: '',
     faviconUrl: '',
     primaryColor: '#FFD369',
@@ -46,7 +46,6 @@ const defaultFormState: FormState = {
     ctaDescription: '',
     ctaButtonText: '',
     whatsappNumber: '',
-    heroTemplate: 'slides',
 };
 
 export default function Settings() {
@@ -63,20 +62,12 @@ export default function Settings() {
     // Track which upload is in progress
     const [uploadingType, setUploadingType] = useState<'logo' | 'favicon' | null>(null);
 
-    // Change Password state
-    const [passwordForm, setPasswordForm] = useState({
-        newPassword: '',
-        confirmPassword: '',
-    });
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [isChangingPassword, setIsChangingPassword] = useState(false);
-
     // Populate form when settings load
     useEffect(() => {
         if (settings) {
             setFormState({
                 siteName: settings.siteName || '',
+                browserTitle: settings.browserTitle || '',
                 logoUrl: settings.logoUrl || '',
                 faviconUrl: settings.faviconUrl || '',
                 primaryColor: settings.primaryColor || '#FFD369',
@@ -86,7 +77,6 @@ export default function Settings() {
                 ctaDescription: settings.ctaDescription || '',
                 ctaButtonText: settings.ctaButtonText || '',
                 whatsappNumber: settings.whatsappNumber || '',
-                heroTemplate: settings.heroTemplate || 'slides',
             });
         }
     }, [settings]);
@@ -94,6 +84,7 @@ export default function Settings() {
     const handleSave = async () => {
         const payload: UpdateSettingsInput = {
             siteName: formState.siteName,
+            browserTitle: formState.browserTitle || null,
             logoUrl: formState.logoUrl || null,
             faviconUrl: formState.faviconUrl || null,
             primaryColor: formState.primaryColor,
@@ -103,7 +94,6 @@ export default function Settings() {
             ctaDescription: formState.ctaDescription || null,
             ctaButtonText: formState.ctaButtonText || null,
             whatsappNumber: formState.whatsappNumber || null,
-            heroTemplate: formState.heroTemplate,
         };
 
         try {
@@ -151,38 +141,6 @@ export default function Settings() {
         e.target.value = '';
     };
 
-    const handleChangePassword = async () => {
-        // Validation
-        if (passwordForm.newPassword.length < 6) {
-            toast.error('Validasi', 'Password minimal 6 karakter');
-            return;
-        }
-
-        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-            toast.error('Validasi', 'Password tidak cocok');
-            return;
-        }
-
-        setIsChangingPassword(true);
-
-        try {
-            const { error } = await supabase.auth.updateUser({
-                password: passwordForm.newPassword,
-            });
-
-            if (error) {
-                toast.error('Error', error.message);
-            } else {
-                toast.success('Berhasil', 'Password berhasil diubah');
-                setPasswordForm({ newPassword: '', confirmPassword: '' });
-            }
-        } catch (err) {
-            toast.error('Error', 'Terjadi kesalahan saat mengubah password');
-        } finally {
-            setIsChangingPassword(false);
-        }
-    };
-
     // Loading state
     if (isLoading) {
         return <SettingsSkeleton />;
@@ -221,9 +179,16 @@ export default function Settings() {
                 <div className="space-y-6">
                     <Input
                         label="Site Name"
-                        placeholder="Your name or brand"
+                        placeholder="Your name or brand (e.g. HARYANTI)"
                         value={formState.siteName}
                         onChange={(e) => setFormState({ ...formState, siteName: e.target.value })}
+                    />
+
+                    <Input
+                        label="Browser Title"
+                        placeholder="Contoh: Haryanti - Graphic Designer & Content Creator"
+                        value={formState.browserTitle}
+                        onChange={(e) => setFormState({ ...formState, browserTitle: e.target.value })}
                     />
 
                     {/* Logo */}
@@ -484,28 +449,6 @@ export default function Settings() {
                         value={formState.ctaButtonText}
                         onChange={(e) => setFormState({ ...formState, ctaButtonText: e.target.value })}
                     />
-
-                    {/* CTA Preview */}
-                    <div>
-                        <label className="block text-sm font-medium text-cms-text-secondary mb-3">
-                            Preview
-                        </label>
-                        <div className="p-6 rounded-xl bg-gradient-to-br from-cms-bg-tertiary to-cms-bg-secondary border border-cms-border text-center">
-                            <Megaphone size={24} className="mx-auto mb-3 text-cms-accent" />
-                            <h3 className="text-lg font-semibold text-cms-text-primary mb-2">
-                                {formState.ctaHeading || "Let's Create Together"}
-                            </h3>
-                            <p className="text-sm text-cms-text-muted mb-4 max-w-md mx-auto">
-                                {formState.ctaDescription || 'Your CTA description will appear here.'}
-                            </p>
-                            <button
-                                className="px-6 py-2 rounded-lg text-black font-medium"
-                                style={{ backgroundColor: formState.primaryColor }}
-                            >
-                                {formState.ctaButtonText || 'Get in Touch'}
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </Card>
 
@@ -529,133 +472,6 @@ export default function Settings() {
                             Masukkan nomor telepon dengan kode negara tanpa tanda + atau spasi. Contoh: 6281234567890 untuk Indonesia.
                             Jika dikosongkan, tombol WhatsApp tidak akan muncul.
                         </p>
-                    </div>
-                </div>
-            </Card>
-
-            {/* Hero Template */}
-            <Card>
-                <CardHeader
-                    title="Hero Template"
-                    description="Pilih tampilan hero section di halaman utama"
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Slides Template Option */}
-                    <button
-                        type="button"
-                        onClick={() => setFormState({ ...formState, heroTemplate: 'slides' })}
-                        className={`p-4 rounded-xl border-2 text-left transition-all ${formState.heroTemplate === 'slides'
-                                ? 'border-cms-accent bg-cms-accent/10'
-                                : 'border-cms-border hover:border-cms-accent/50'
-                            }`}
-                    >
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${formState.heroTemplate === 'slides'
-                                    ? 'border-cms-accent bg-cms-accent'
-                                    : 'border-cms-border'
-                                }`}>
-                                {formState.heroTemplate === 'slides' && (
-                                    <div className="w-2 h-2 rounded-full bg-white" />
-                                )}
-                            </div>
-                            <span className="font-medium text-cms-text-primary">Horizontal Slides</span>
-                        </div>
-                        <p className="text-sm text-cms-text-muted">
-                            Hero dengan horizontal scroll panels - cocok untuk menampilkan banyak konten
-                        </p>
-                    </button>
-
-                    {/* Modern Template Option */}
-                    <button
-                        type="button"
-                        onClick={() => setFormState({ ...formState, heroTemplate: 'modern' })}
-                        className={`p-4 rounded-xl border-2 text-left transition-all ${formState.heroTemplate === 'modern'
-                                ? 'border-cms-accent bg-cms-accent/10'
-                                : 'border-cms-border hover:border-cms-accent/50'
-                            }`}
-                    >
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${formState.heroTemplate === 'modern'
-                                    ? 'border-cms-accent bg-cms-accent'
-                                    : 'border-cms-border'
-                                }`}>
-                                {formState.heroTemplate === 'modern' && (
-                                    <div className="w-2 h-2 rounded-full bg-white" />
-                                )}
-                            </div>
-                            <span className="font-medium text-cms-text-primary">Modern (Hello!)</span>
-                        </div>
-                        <p className="text-sm text-cms-text-muted">
-                            Hero bersih dengan greeting bubble dan foto profil - lebih personal dan minimalis
-                        </p>
-                    </button>
-                </div>
-            </Card>
-
-            {/* Change Password */}
-            <Card>
-                <CardHeader
-                    title="Change Password"
-                    description="Ubah password akun CMS Anda"
-                />
-
-                <div className="space-y-4">
-                    {/* New Password */}
-                    <div>
-                        <label className="block text-sm font-medium text-cms-text-secondary mb-2">
-                            New Password
-                        </label>
-                        <div className="relative">
-                            <Input
-                                type={showNewPassword ? 'text' : 'password'}
-                                placeholder="Minimal 6 karakter"
-                                value={passwordForm.newPassword}
-                                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowNewPassword(!showNewPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-cms-text-muted hover:text-cms-text-secondary"
-                            >
-                                {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Confirm Password */}
-                    <div>
-                        <label className="block text-sm font-medium text-cms-text-secondary mb-2">
-                            Confirm New Password
-                        </label>
-                        <div className="relative">
-                            <Input
-                                type={showConfirmPassword ? 'text' : 'password'}
-                                placeholder="Masukkan ulang password baru"
-                                value={passwordForm.confirmPassword}
-                                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-cms-text-muted hover:text-cms-text-secondary"
-                            >
-                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Change Password Button */}
-                    <div className="pt-2">
-                        <Button
-                            variant="secondary"
-                            onClick={handleChangePassword}
-                            isLoading={isChangingPassword}
-                            disabled={!passwordForm.newPassword || !passwordForm.confirmPassword}
-                        >
-                            <Lock size={16} />
-                            Change Password
-                        </Button>
                     </div>
                 </div>
             </Card>

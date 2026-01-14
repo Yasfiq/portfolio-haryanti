@@ -168,6 +168,7 @@ export interface FunSchemaContent {
 export interface SiteSettings {
     id: string;
     siteName: string;
+    browserTitle?: string;
     logoUrl?: string;
     faviconUrl?: string;
     primaryColor: string;
@@ -176,7 +177,6 @@ export interface SiteSettings {
     ctaHeading?: string;
     ctaDescription?: string;
     ctaButtonText?: string;
-    heroTemplate: string;
     whatsappNumber?: string;
 }
 
