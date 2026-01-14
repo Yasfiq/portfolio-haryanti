@@ -15,12 +15,17 @@
 
 @layer base {
   :root {
+    /* Hex colors (for inline styles and fallback) */
     --primary: #f37430;
     --secondary: #754c45;
     --tertiary: #402e32;
     --foreground: #1a1a1a;
     --muted: #6b5b57;
     --background: #ffffff;
+
+    /* RGB values for Tailwind opacity support */
+    --primary-rgb: 243 116 48;
+    --secondary-rgb: 117 76 69;
 
     /* Golden Ratio Spacing */
     --space-1: 4px;

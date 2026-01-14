@@ -7,6 +7,10 @@ export class UpdateSettingsDto {
 
     @IsOptional()
     @IsString()
+    browserTitle?: string;
+
+    @IsOptional()
+    @IsString()
     logoUrl?: string;
 
     @IsOptional()
@@ -36,4 +40,8 @@ export class UpdateSettingsDto {
     @IsOptional()
     @IsString()
     ctaButtonText?: string;
+
+    @IsOptional()
+    @IsString()
+    whatsappNumber?: string;
 }

@@ -1,6 +1,5 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
-import { useProfile } from '../../../hooks/useProfile';
 import { useSettings } from '../../../hooks/useSettings';
 
 /**
@@ -17,11 +16,11 @@ const HeroModern = () => {
     const photoRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLDivElement>(null);
 
-    const { data: profile } = useProfile();
     const { data: settings } = useSettings();
 
-    // Get primary color from settings or use default
+    // Get primary color and site name from settings
     const primaryColor = settings?.primaryColor || '#f97316'; // orange default
+    const siteName = settings?.siteName || 'Haryanti';
 
     // Entrance animations
     useEffect(() => {
@@ -131,50 +130,20 @@ const HeroModern = () => {
                         </svg>
                     </div>
 
-                    {/* Profile Photo with BREAKOUT Effect (#12) */}
+                    {/* Profile Photo Circle */}
                     <div
                         ref={photoRef}
                         className="relative mb-8"
                     >
-                        {/* Background circle - colored */}
+                        {/* Colored circle with initial */}
                         <div
-                            className="w-48 h-48 md:w-64 md:h-64 rounded-full relative"
+                            className="w-48 h-48 md:w-64 md:h-64 rounded-full relative flex items-center justify-center"
                             style={{ backgroundColor: primaryColor }}
                         >
-                            {/* This div just provides the colored circle background */}
+                            <span className="text-6xl md:text-8xl text-white/80 font-bold">
+                                {siteName.charAt(0)}
+                            </span>
                         </div>
-
-                        {/* Photo container - positioned to "break out" of the circle */}
-                        {profile?.avatarUrl && (
-                            <div
-                                className="absolute inset-0 flex items-end justify-center"
-                                style={{
-                                    // Allow image to overflow the container
-                                    overflow: 'visible',
-                                    // Position from bottom of circle
-                                    bottom: '-10%',
-                                }}
-                            >
-                                <img
-                                    src={profile.avatarUrl}
-                                    alt={profile.name}
-                                    className="w-full max-w-[120%] object-contain object-bottom drop-shadow-2xl"
-                                    style={{
-                                        // Make image larger than container to create breakout effect
-                                        transform: 'scale(1.25) translateY(-8%)',
-                                        // Filter for PNG transparency edge softening
-                                        filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
-                                    }}
-                                />
-                            </div>
-                        )}
-
-                        {/* Fallback initial when no photo */}
-                        {!profile?.avatarUrl && (
-                            <div className="absolute inset-0 flex items-center justify-center text-6xl text-white/80">
-                                {profile?.name?.charAt(0) || 'H'}
-                            </div>
-                        )}
 
                         {/* Decorative floating elements */}
                         <div
@@ -190,10 +159,10 @@ const HeroModern = () => {
                     {/* Name and Title */}
                     <div ref={textRef}>
                         <h1 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">
-                            {profile?.name || 'Haryanti'}
+                            {siteName}
                         </h1>
                         <p className="text-lg md:text-xl text-muted max-w-xl mx-auto">
-                            {profile?.title || 'Graphic Designer & Content Creator'}
+                            Graphic Designer & Content Creator
                         </p>
 
                         {/* CTA Buttons */}

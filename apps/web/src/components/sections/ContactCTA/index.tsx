@@ -2,10 +2,17 @@ import { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import SectionDecoration from '../../shared/SectionDecoration';
+import { useSettings } from '../../../hooks/useSettings';
 
 const ContactCTA = () => {
+    const { data: settings } = useSettings();
     const containerRef = useRef<HTMLDivElement>(null);
     const orbsRef = useRef<HTMLDivElement>(null);
+
+    // Get CTA content from settings with fallbacks
+    const ctaHeading = settings?.ctaHeading || 'Have a project in mind?';
+    const ctaDescription = settings?.ctaDescription || "Let's create something amazing together. I'm always excited to work on new and challenging projects.";
+    const ctaButtonText = settings?.ctaButtonText || "Let's Talk ✨";
 
     // Generate random orbs
     const orbs = Array.from({ length: 15 }, (_, i) => ({
@@ -95,7 +102,7 @@ const ContactCTA = () => {
                         className="absolute -top-6 -left-10 md:-left-14"
                     />
                     <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-golden-5">
-                        Have a project in mind?
+                        {ctaHeading}
                     </h2>
                     <SectionDecoration
                         position="bottom-right"
@@ -104,8 +111,7 @@ const ContactCTA = () => {
                     />
                 </div>
                 <p className="text-muted text-lg mb-golden-7">
-                    Let's create something amazing together. I'm always excited to work on
-                    new and challenging projects.
+                    {ctaDescription}
                 </p>
 
                 {/* CTA Button */}
@@ -114,7 +120,7 @@ const ContactCTA = () => {
                     className="magnetic-btn text-lg px-golden-7 py-golden-5"
                     data-cursor-hover
                 >
-                    Let's Talk ✨
+                    {ctaButtonText}
                 </Link>
             </div>
         </section>
