@@ -12,6 +12,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Preloader from './components/shared/Preloader';
 import CustomCursor from './components/layout/CustomCursor';
+import ThemeProvider from './components/shared/ThemeProvider';
 
 import './index.css';
 
@@ -52,17 +53,19 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <Preloader />
-          <CustomCursor />
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="projects" element={<Projects />} />
-              <Route path="projects/:slug" element={<ProjectDetail />} />
-              <Route path="about" element={<About />} />
-              <Route path="contact" element={<Contact />} />
-            </Route>
-          </Routes>
+          <ThemeProvider>
+            <Preloader />
+            <CustomCursor />
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="projects" element={<Projects />} />
+                <Route path="projects/:slug" element={<ProjectDetail />} />
+                <Route path="about" element={<About />} />
+                <Route path="contact" element={<Contact />} />
+              </Route>
+            </Routes>
+          </ThemeProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </HelmetProvider>

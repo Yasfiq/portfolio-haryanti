@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { User, LogOut, Settings, UserCircle, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useProfile } from '../../hooks/useProfile';
 
 /**
  * User dropdown menu component for the header
@@ -13,11 +12,9 @@ export default function UserDropdown() {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const { data: profile } = useProfile();
 
     // Extract username from email
     const username = user?.email?.split('@')[0] || 'Admin';
-    const avatarUrl = profile?.avatarUrl;
 
     // Handle click outside to close dropdown
     useEffect(() => {
@@ -88,15 +85,7 @@ export default function UserDropdown() {
             >
                 {/* Avatar */}
                 <div className="w-8 h-8 rounded-full bg-cms-accent/20 flex items-center justify-center overflow-hidden">
-                    {avatarUrl ? (
-                        <img
-                            src={avatarUrl}
-                            alt={username}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <User size={16} className="text-cms-accent" />
-                    )}
+                    <User size={16} className="text-cms-accent" />
                 </div>
 
                 {/* User Info */}

@@ -27,19 +27,13 @@ model Admin {
 
 model Profile {
   id               String       @id @default(uuid())
-  name             String       @default("")
-  tagline          String?
-  bio              String?
-  profileImageUrl  String?
-  heroImageUrl     String?
-  email            String
-  resumeUrl        String?
-  footerText       String?
+  title            String?      // Displayed in Footer (below site name)
+  bio              String?      // Displayed in Footer (short excerpt)
+  email            String       // Contact email
+  resumeUrl        String?      // Resume PDF for download
   linkedinUrl      String?
   instagramUrl     String?
-  tiktokUrl        String?
   pinterestUrl     String?
-  youtubeUrl       String?
   updatedAt        DateTime     @updatedAt
   educations       Education[]
 }
@@ -160,6 +154,7 @@ model HeroSlide {
 model SiteSettings {
   id             String   @id @default(uuid())
   siteName       String   @default("Haryanti")
+  browserTitle   String?
   logoUrl        String?
   faviconUrl     String?
   primaryColor   String   @default("#FFD369")
@@ -168,9 +163,8 @@ model SiteSettings {
   ctaHeading     String?
   ctaDescription String?
   ctaButtonText  String?
-  updatedAt      DateTime @updatedAt
-  heroTemplate   String   @default("slides")
   whatsappNumber String?
+  updatedAt      DateTime @updatedAt
 }
 
 enum SkillCategory {
