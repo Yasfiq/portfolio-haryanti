@@ -1,10 +1,9 @@
 import { useState, useRef } from 'react';
-import { Plus, Pencil, Trash2, GripVertical, AlertCircle, RefreshCw, Sparkles } from 'lucide-react';
+import { Plus, Pencil, Trash2, GripVertical, AlertCircle, RefreshCw, Sparkles, Upload, X, Loader2 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
-import Textarea from '../components/ui/Textarea';
 import { SkillsSkeleton } from '../components/skeletons/SkillsSkeleton';
 import {
     useSkills,
@@ -13,6 +12,7 @@ import {
     useDeleteSkill,
     useReorderSkills
 } from '../hooks/useSkills';
+import { useUpload } from '../hooks/useUpload';
 import { useToastHelpers } from '../context/ToastContext';
 import type { Skill, SkillCategory } from '../types/skill.types';
 
@@ -21,7 +21,7 @@ type ColorType = 'none' | 'solid' | 'gradient';
 interface FormData {
     name: string;
     shortName: string;
-    description: string;
+    iconUrl: string;
     gradientFrom: string;
     gradientTo: string;
     gradientVia: string;
@@ -34,6 +34,7 @@ export default function Skills() {
     const updateMutation = useUpdateSkill();
     const deleteMutation = useDeleteSkill();
     const reorderMutation = useReorderSkills(activeTab);
+    const { uploadAvatar, isUploading: isUploadingIcon } = useUpload();
     const toast = useToastHelpers();
 
     // Filter skills by active tab
@@ -57,19 +58,20 @@ export default function Skills() {
     const [formData, setFormData] = useState<FormData>({
         name: '',
         shortName: '',
-        description: '',
+        iconUrl: '',
         gradientFrom: '#31A8FF',
         gradientTo: '#001E36',
         gradientVia: '',
     });
     const [colorType, setColorType] = useState<ColorType>('none');
     const [useThreeColors, setUseThreeColors] = useState(false);
+    const iconInputRef = useRef<HTMLInputElement>(null);
 
     const openAddModal = () => {
         setFormData({
             name: '',
             shortName: '',
-            description: '',
+            iconUrl: '',
             gradientFrom: '#31A8FF',
             gradientTo: '#001E36',
             gradientVia: '',
@@ -83,7 +85,7 @@ export default function Skills() {
         setFormData({
             name: skill.name,
             shortName: skill.shortName || '',
-            description: skill.description || '',
+            iconUrl: skill.iconUrl || '',
             gradientFrom: skill.gradientFrom || '#31A8FF',
             gradientTo: skill.gradientTo || '#001E36',
             gradientVia: skill.gradientVia || '',
@@ -99,6 +101,40 @@ export default function Skills() {
             setUseThreeColors(false);
         }
         setEditModal({ isOpen: true, skill });
+    };
+
+    // Handle icon upload
+    const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type for icons (allow SVG)
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('Format Tidak Valid', 'Hanya PNG, JPG, WebP, atau SVG yang diperbolehkan');
+            return;
+        }
+
+        // Validate size (max 2MB for icons)
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('File Terlalu Besar', 'Ukuran maksimal icon adalah 2MB');
+            return;
+        }
+
+        const result = await uploadAvatar(file);
+        if (result) {
+            setFormData(prev => ({ ...prev, iconUrl: result.url }));
+            toast.success('Berhasil', 'Icon berhasil diupload');
+        }
+
+        // Reset input
+        if (iconInputRef.current) {
+            iconInputRef.current.value = '';
+        }
+    };
+
+    const handleRemoveIcon = () => {
+        setFormData(prev => ({ ...prev, iconUrl: '' }));
     };
 
     const handleSave = async () => {
@@ -125,7 +161,7 @@ export default function Skills() {
                     data: {
                         name: formData.name,
                         shortName: formData.shortName || null,
-                        description: formData.description || null,
+                        iconUrl: formData.iconUrl || null,
                         gradientFrom,
                         gradientTo,
                         gradientVia,
@@ -137,7 +173,7 @@ export default function Skills() {
                     name: formData.name,
                     shortName: formData.shortName || null,
                     category: activeTab,
-                    description: formData.description || null,
+                    iconUrl: formData.iconUrl || null,
                     gradientFrom,
                     gradientTo,
                     gradientVia,
@@ -277,8 +313,8 @@ export default function Skills() {
                 <button
                     onClick={() => setActiveTab('HARD_SKILL')}
                     className={`pb-3 px-1 text-sm font-medium transition-colors ${activeTab === 'HARD_SKILL'
-                            ? 'text-cms-accent border-b-2 border-cms-accent'
-                            : 'text-cms-text-secondary hover:text-cms-text-primary'
+                        ? 'text-cms-accent border-b-2 border-cms-accent'
+                        : 'text-cms-text-secondary hover:text-cms-text-primary'
                         }`}
                 >
                     Hard Skills ({hardSkillsCount})
@@ -286,8 +322,8 @@ export default function Skills() {
                 <button
                     onClick={() => setActiveTab('SOFT_SKILL')}
                     className={`pb-3 px-1 text-sm font-medium transition-colors ${activeTab === 'SOFT_SKILL'
-                            ? 'text-cms-accent border-b-2 border-cms-accent'
-                            : 'text-cms-text-secondary hover:text-cms-text-primary'
+                        ? 'text-cms-accent border-b-2 border-cms-accent'
+                        : 'text-cms-text-secondary hover:text-cms-text-primary'
                         }`}
                 >
                     Soft Skills ({softSkillsCount})
@@ -316,8 +352,8 @@ export default function Skills() {
 
                         <Card
                             className={`flex items-start gap-3 transition-all duration-200 ${draggingIndex === index
-                                    ? 'opacity-50 scale-[0.98] ring-2 ring-cms-accent/50'
-                                    : ''
+                                ? 'opacity-50 scale-[0.98] ring-2 ring-cms-accent/50'
+                                : ''
                                 }`}
                             draggable
                             onDragStart={(e) => handleDragStart(e, index)}
@@ -333,12 +369,16 @@ export default function Skills() {
 
                             {/* Icon/Color preview */}
                             <div
-                                className="w-10 h-10 rounded-lg border border-cms-border flex items-center justify-center flex-shrink-0"
+                                className="w-10 h-10 rounded-lg border border-cms-border flex items-center justify-center flex-shrink-0 overflow-hidden"
                                 style={{ background: getSkillBackground(skill) }}
                             >
-                                <span className="text-lg text-white/80">
-                                    {skill.shortName?.charAt(0) || skill.name.charAt(0)}
-                                </span>
+                                {skill.iconUrl ? (
+                                    <img src={skill.iconUrl} alt={skill.name} className="w-full h-full object-contain p-1" />
+                                ) : (
+                                    <span className="text-lg text-white/80">
+                                        {skill.shortName?.charAt(0) || skill.name.charAt(0)}
+                                    </span>
+                                )}
                             </div>
 
                             {/* Content */}
@@ -347,11 +387,6 @@ export default function Skills() {
                                 {skill.shortName && (
                                     <p className="text-xs text-cms-text-muted truncate">
                                         Display: {skill.shortName}
-                                    </p>
-                                )}
-                                {skill.description && (
-                                    <p className="text-sm text-cms-text-muted truncate mt-0.5">
-                                        {skill.description}
                                     </p>
                                 )}
                             </div>
@@ -416,14 +451,67 @@ export default function Skills() {
                         />
                     </div>
 
-                    {activeTab === 'SOFT_SKILL' && (
-                        <Textarea
-                            label="Deskripsi (Opsional)"
-                            placeholder="Deskripsi singkat skill ini..."
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        />
-                    )}
+                    {/* Icon Upload Section */}
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-cms-text-secondary">
+                            Icon Skill
+                        </label>
+                        <div className="flex items-start gap-4">
+                            {/* Preview */}
+                            <div
+                                className="w-16 h-16 rounded-lg border border-cms-border flex items-center justify-center overflow-hidden flex-shrink-0"
+                                style={{ background: activeTab === 'HARD_SKILL' ? getPreviewBackground() : 'var(--cms-bg-tertiary)' }}
+                            >
+                                {formData.iconUrl ? (
+                                    <img src={formData.iconUrl} alt="Icon preview" className="w-full h-full object-contain p-2" />
+                                ) : (
+                                    <span className="text-2xl text-white/60">
+                                        {formData.shortName?.charAt(0) || formData.name?.charAt(0) || '?'}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Upload controls */}
+                            <div className="flex-1 space-y-2">
+                                <input
+                                    ref={iconInputRef}
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                                    onChange={handleIconUpload}
+                                    className="hidden"
+                                    id="icon-upload"
+                                />
+                                <label
+                                    htmlFor="icon-upload"
+                                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all
+                                        ${isUploadingIcon
+                                            ? 'bg-cms-bg-tertiary text-cms-text-muted cursor-not-allowed'
+                                            : 'bg-cms-bg-secondary text-cms-text-secondary hover:bg-cms-bg-tertiary hover:text-cms-text-primary'
+                                        }`}
+                                >
+                                    {isUploadingIcon ? (
+                                        <Loader2 size={16} className="animate-spin" />
+                                    ) : (
+                                        <Upload size={16} />
+                                    )}
+                                    {isUploadingIcon ? 'Mengupload...' : 'Upload Icon'}
+                                </label>
+                                {formData.iconUrl && (
+                                    <button
+                                        type="button"
+                                        onClick={handleRemoveIcon}
+                                        className="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-cms-error hover:bg-cms-error/10 rounded-lg transition-colors ml-2"
+                                    >
+                                        <X size={14} />
+                                        Hapus
+                                    </button>
+                                )}
+                                <p className="text-xs text-cms-text-muted">
+                                    PNG, JPG, WebP, atau SVG. Maks 2MB.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Color Options - only for hard skills */}
                     {activeTab === 'HARD_SKILL' && (
@@ -437,8 +525,8 @@ export default function Skills() {
                                         key={type}
                                         onClick={() => setColorType(type)}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${colorType === type
-                                                ? 'bg-cms-accent text-black'
-                                                : 'bg-cms-bg-secondary text-cms-text-secondary hover:bg-cms-bg-tertiary'
+                                            ? 'bg-cms-accent text-black'
+                                            : 'bg-cms-bg-secondary text-cms-text-secondary hover:bg-cms-bg-tertiary'
                                             }`}
                                     >
                                         {type === 'none' ? 'Tidak Ada' : type === 'solid' ? 'Solid' : 'Gradient'}

@@ -21,7 +21,7 @@ export interface CreateSkillInput {
     name: string;
     shortName?: string | null;
     category: SkillCategory;
-    description?: string | null;
+    iconUrl?: string | null;
     gradientFrom?: string | null;
     gradientTo?: string | null;
     gradientVia?: string | null;
@@ -30,7 +30,7 @@ export interface CreateSkillInput {
 export interface UpdateSkillInput {
     name?: string;
     shortName?: string | null;
-    description?: string | null;
+    iconUrl?: string | null;
     gradientFrom?: string | null;
     gradientTo?: string | null;
     gradientVia?: string | null;
