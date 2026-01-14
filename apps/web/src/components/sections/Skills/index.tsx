@@ -71,8 +71,15 @@ const getGradientStyle = (skill: Skill) => {
             background: `linear-gradient(135deg, ${skill.gradientFrom || '#666'} 0%, ${skill.gradientVia} 50%, ${skill.gradientTo || '#333'} 100%)`,
         };
     }
+
+    if (skill.gradientTo) {
+        return {
+            background: `linear-gradient(135deg, ${skill.gradientFrom || '#666'} 0%, ${skill.gradientTo || '#333'} 100%)`,
+        };
+    }
+
     return {
-        background: `linear-gradient(135deg, ${skill.gradientFrom || '#666'} 0%, ${skill.gradientTo || '#333'} 100%)`,
+        background: `${skill.gradientFrom || '#666'}`,
     };
 };
 
@@ -106,42 +113,50 @@ const Skills = () => {
 
         if (!section || !softContainer || !hardContainer) return;
 
+        // Get elements
+        const softCards = softContainer.querySelectorAll('.soft-skill-card');
+        const hardCards = hardContainer.querySelectorAll('.hard-skill-card');
+
+        if (softCards.length === 0 && hardCards.length === 0) return;
+
+        // Set initial state
+        gsap.set(softCards, { y: 30, opacity: 0 });
+        gsap.set(hardCards, { scale: 0.8, opacity: 0 });
+
         // Animate soft skill cards
-        gsap.fromTo(
-            softContainer.querySelectorAll('.soft-skill-card'),
-            { y: 30, opacity: 0 },
-            {
-                y: 0,
-                opacity: 1,
-                duration: 0.6,
-                stagger: 0.1,
-                scrollTrigger: {
-                    trigger: softContainer,
-                    start: 'top 80%',
-                    toggleActions: 'play none none reverse',
-                },
-            }
-        );
+        const softAnim = gsap.to(softCards, {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            scrollTrigger: {
+                trigger: softContainer,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse',
+            },
+        });
 
         // Animate hard skill cards
-        gsap.fromTo(
-            hardContainer.querySelectorAll('.hard-skill-card'),
-            { scale: 0.8, opacity: 0 },
-            {
-                scale: 1,
-                opacity: 1,
-                duration: 0.5,
-                stagger: 0.08,
-                scrollTrigger: {
-                    trigger: hardContainer,
-                    start: 'top 80%',
-                    toggleActions: 'play none none reverse',
-                },
-            }
-        );
+        const hardAnim = gsap.to(hardCards, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.08,
+            scrollTrigger: {
+                trigger: hardContainer,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse',
+            },
+        });
+
+        // Refresh ScrollTrigger after setup
+        ScrollTrigger.refresh();
 
         return () => {
-            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            softAnim.scrollTrigger?.kill();
+            hardAnim.scrollTrigger?.kill();
+            softAnim.kill();
+            hardAnim.kill();
         };
     }, [hardSkills.length, softSkills.length]);
 
@@ -165,50 +180,36 @@ const Skills = () => {
             </div>
 
             <div className="grid md:grid-cols-2 gap-golden-7">
-                {/* Hard Skills - CUBE SHAPE (#6) */}
+                {/* Hard Skills - Compact Cards (#6) */}
                 <div>
                     <h3 className="text-lg font-semibold mb-golden-5 text-primary">
                         Hard Skills
                     </h3>
-                    <div ref={hardSkillsRef} className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div ref={hardSkillsRef} className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                         {hardSkills.map((skill) => (
                             <div
                                 key={skill.id}
-                                className="hard-skill-card group relative overflow-hidden aspect-square cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20"
-                                style={{
-                                    ...getGradientStyle(skill),
-                                    // CUBE SHAPE: use very small border-radius or none for cube effect
-                                    borderRadius: '12px',
-                                }}
+                                className="hard-skill-card group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 p-3 rounded-xl flex flex-col items-center justify-center text-center gap-2"
+                                style={getGradientStyle(skill)}
                             >
-                                {/* Glassmorphism overlay */}
-                                <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]" />
-
-                                {/* Content - centered in cube */}
-                                <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-3">
-                                    {/* Icon - either uploaded image or fallback */}
-                                    <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm mb-3 text-white group-hover:scale-110 transition-transform duration-300">
-                                        {skill.iconUrl ? (
-                                            <img
-                                                src={skill.iconUrl}
-                                                alt={skill.name}
-                                                className="w-8 h-8 object-contain"
-                                            />
-                                        ) : (
-                                            <span className="text-2xl font-bold">
-                                                {(skill.shortName || skill.name).charAt(0)}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span className="text-sm font-semibold text-white drop-shadow-md">
-                                        {skill.shortName || skill.name}
-                                    </span>
+                                {/* Icon - directly on gradient background */}
+                                <div className="flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
+                                    {skill.iconUrl ? (
+                                        <img
+                                            src={skill.iconUrl}
+                                            alt={skill.name}
+                                            className="w-full h-full object-contain"
+                                        />
+                                    ) : (
+                                        <span className="text-2xl font-bold">
+                                            {(skill.shortName || skill.name).charAt(0)}
+                                        </span>
+                                    )}
                                 </div>
-
-                                {/* Shine effect on hover */}
-                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                                </div>
+                                {/* Text */}
+                                <span className="text-base font-medium drop-shadow-md leading-tight">
+                                    {skill.shortName || skill.name}
+                                </span>
                             </div>
                         ))}
                     </div>
