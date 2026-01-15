@@ -3,11 +3,7 @@ import { IsString, IsOptional, IsEmail, IsBoolean, IsNumber } from 'class-valida
 export class UpdateProfileDto {
     @IsOptional()
     @IsString()
-    name?: string;
-
-    @IsOptional()
-    @IsString()
-    tagline?: string;
+    title?: string;
 
     @IsOptional()
     @IsString()
@@ -15,15 +11,11 @@ export class UpdateProfileDto {
 
     @IsOptional()
     @IsString()
-    profileImageUrl?: string;
+    aboutBio?: string;
 
     @IsOptional()
     @IsString()
-    heroImageUrl?: string;
-
-    @IsOptional()
-    @IsString()
-    resumeUrl?: string;
+    aboutImageUrl?: string;
 
     @IsOptional()
     @IsEmail()
@@ -31,7 +23,7 @@ export class UpdateProfileDto {
 
     @IsOptional()
     @IsString()
-    footerText?: string;
+    resumeUrl?: string;
 
     @IsOptional()
     @IsString()
@@ -43,16 +35,9 @@ export class UpdateProfileDto {
 
     @IsOptional()
     @IsString()
-    tiktokUrl?: string;
-
-    @IsOptional()
-    @IsString()
     pinterestUrl?: string;
-
-    @IsOptional()
-    @IsString()
-    youtubeUrl?: string;
 }
+
 
 export class CreateEducationDto {
     @IsString()
