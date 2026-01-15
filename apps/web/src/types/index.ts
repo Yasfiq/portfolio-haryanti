@@ -51,27 +51,15 @@ export type ProjectCategory = ClientCategory;
 // ============ Profile ============
 export interface Profile {
     id: string;
-    name: string;
-    tagline?: string;
-    title?: string;          // Legacy alias for tagline
-    bio?: string;
-    profileImageUrl?: string;
-    avatarUrl?: string;      // Legacy alias for profileImageUrl
-    heroImageUrl?: string;
-    email?: string;
-    resumeUrl?: string;
-    footerText?: string;
+    title?: string;          // Displayed in Footer and About page
+    bio?: string;            // Displayed in Footer (short excerpt)
+    aboutBio?: string;       // Displayed in About page (full bio)
+    aboutImageUrl?: string;  // Displayed in About page (photo with breakout effect)
+    email?: string;          // Contact email
+    resumeUrl?: string;      // Resume PDF for download
     linkedinUrl?: string;
     instagramUrl?: string;
-    tiktokUrl?: string;
     pinterestUrl?: string;
-    youtubeUrl?: string;
-    // Legacy fields
-    phone?: string;
-    location?: string;
-    behanceUrl?: string;
-    dribbbleUrl?: string;
-    githubUrl?: string;
 }
 
 // ============ Skills ============
