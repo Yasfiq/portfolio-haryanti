@@ -19,10 +19,11 @@ export default function Profile() {
     const toast = useToastHelpers();
 
     // Upload hooks
-    const { uploadResume, isUploading } = useUpload();
+    const { upload, uploadResume, isUploading } = useUpload();
 
     // File input refs
     const resumeInputRef = useRef<HTMLInputElement>(null);
+    const aboutImageInputRef = useRef<HTMLInputElement>(null);
 
     // Change Password state
     const [passwordForm, setPasswordForm] = useState({
@@ -45,6 +46,8 @@ export default function Profile() {
         defaultValues: {
             title: '',
             bio: '',
+            aboutBio: '',
+            aboutImageUrl: null,
             email: '',
             resumeUrl: null,
             linkedinUrl: null,
@@ -55,6 +58,7 @@ export default function Profile() {
 
     // Watch for URL values
     const resumeUrl = watch('resumeUrl');
+    const aboutImageUrl = watch('aboutImageUrl');
 
     // Reset form when profile data is loaded
     useEffect(() => {
@@ -62,6 +66,8 @@ export default function Profile() {
             reset({
                 title: profile.title ?? '',
                 bio: profile.bio ?? '',
+                aboutBio: profile.aboutBio ?? '',
+                aboutImageUrl: profile.aboutImageUrl,
                 email: profile.email ?? '',
                 resumeUrl: profile.resumeUrl,
                 linkedinUrl: profile.linkedinUrl,
@@ -95,6 +101,29 @@ export default function Profile() {
         // Reset input
         if (resumeInputRef.current) {
             resumeInputRef.current.value = '';
+        }
+    };
+
+    // Handle about image upload
+    const handleAboutImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate image type
+        if (!file.type.startsWith('image/')) {
+            toast.error('Format Tidak Valid', 'Hanya file gambar yang diperbolehkan');
+            return;
+        }
+
+        const result = await upload(file);
+        if (result) {
+            setValue('aboutImageUrl', result.url, { shouldDirty: true });
+            toast.success('Upload Berhasil', 'Foto About berhasil diupload');
+        }
+
+        // Reset input
+        if (aboutImageInputRef.current) {
+            aboutImageInputRef.current.value = '';
         }
     };
 
@@ -170,18 +199,88 @@ export default function Profile() {
                         {...register('title')}
                     />
                     <p className="text-xs text-cms-text-muted -mt-4">
-                        Ditampilkan di Footer (di bawah nama site)
+                        Ditampilkan di Footer dan About Page
                     </p>
 
                     <Textarea
-                        label="Bio"
-                        placeholder="Tell about yourself..."
+                        label="Bio (Ringkas)"
+                        placeholder="Bio singkat untuk footer..."
                         error={errors.bio?.message}
                         {...register('bio')}
                     />
                     <p className="text-xs text-cms-text-muted -mt-4">
                         Ditampilkan di Footer (cuplikan max 120 karakter)
                     </p>
+
+                    <Textarea
+                        label="About Bio (Lengkap)"
+                        placeholder="Ceritakan tentang diri Anda secara lengkap untuk halaman About..."
+                        error={errors.aboutBio?.message}
+                        {...register('aboutBio')}
+                    />
+                    <p className="text-xs text-cms-text-muted -mt-4">
+                        Ditampilkan di About Page (deskripsi lengkap)
+                    </p>
+
+                    {/* About Image Upload */}
+                    <div>
+                        <label className="block text-sm font-medium text-cms-text-secondary mb-2">
+                            Foto About Page
+                        </label>
+                        <p className="text-xs text-cms-text-muted mb-3">
+                            Upload foto untuk ditampilkan di halaman About
+                        </p>
+
+                        <div className="flex items-start gap-6">
+                            {/* Photo Preview */}
+                            <div className="w-40 h-40 flex-shrink-0 rounded-lg overflow-hidden bg-cms-bg-secondary border border-cms-border">
+                                {aboutImageUrl ? (
+                                    <img
+                                        src={aboutImageUrl}
+                                        alt="About Preview"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <span className="text-3xl font-bold text-cms-text-muted">H</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Upload Controls */}
+                            <div className="flex flex-col gap-3">
+                                <p className="text-xs text-cms-text-muted">
+                                    Preview menunjukkan bagaimana foto akan tampil di About Page
+                                </p>
+                                <input
+                                    ref={aboutImageInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAboutImageUpload}
+                                    className="hidden"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => aboutImageInputRef.current?.click()}
+                                    disabled={isUploading}
+                                >
+                                    {isUploading ? (
+                                        <Loader2 size={16} className="animate-spin" />
+                                    ) : (
+                                        <Upload size={16} />
+                                    )}
+                                    {isUploading ? 'Uploading...' : aboutImageUrl ? 'Ganti Foto' : 'Upload Foto'}
+                                </Button>
+                                {aboutImageUrl && (
+                                    <span className="text-xs text-green-600">
+                                        ✓ Foto berhasil diupload
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
 
                     <Input
                         label="Email Kontak"

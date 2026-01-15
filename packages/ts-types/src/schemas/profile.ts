@@ -1,12 +1,15 @@
 import { z } from 'zod';
 
 // Profile Schema
-// title: Displayed in Footer (below site name)
-// bio: Displayed in Footer (short excerpt)
+// title: Displayed in Footer (below site name) and About page
+// bio: Displayed in Footer (short excerpt max 120 chars)
+// aboutBio: Displayed in About page (full bio description)
 export const ProfileSchema = z.object({
     id: z.string().uuid(),
     title: z.string().min(1, 'Title is required'),
     bio: z.string().min(1, 'Bio is required'),
+    aboutBio: z.string().nullable(),
+    aboutImageUrl: z.string().url().nullable(),
     resumeUrl: z.string().url().nullable(),
     email: z.string().email('Invalid email'),
     linkedinUrl: z.string().url().nullable(),

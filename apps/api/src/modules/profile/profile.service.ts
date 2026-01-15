@@ -32,8 +32,7 @@ export class ProfileService {
         // Create new profile
         return prisma.profile.create({
             data: {
-                name: updateProfileDto.name || '',
-                tagline: updateProfileDto.tagline || '',
+                title: updateProfileDto.title || '',
                 bio: updateProfileDto.bio || '',
                 email: updateProfileDto.email || '',
                 ...updateProfileDto,

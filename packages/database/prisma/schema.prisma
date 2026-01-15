@@ -27,10 +27,12 @@ model Admin {
 
 model Profile {
   id               String       @id @default(uuid())
-  title            String?      // Displayed in Footer (below site name)
-  bio              String?      // Displayed in Footer (short excerpt)
-  email            String       // Contact email
-  resumeUrl        String?      // Resume PDF for download
+  title            String?      // Displayed in Footer and About page
+  bio              String?      // Displayed in Footer (short excerpt max 120 chars)
+  aboutBio         String?      // Displayed in About page (full bio description)
+  aboutImageUrl    String?      // Displayed in About page (photo with breakout effect)
+  email            String       // Contact email displayed in Footer
+  resumeUrl        String?      // Resume PDF for download in Footer
   linkedinUrl      String?
   instagramUrl     String?
   pinterestUrl     String?
