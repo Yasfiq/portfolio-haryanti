@@ -4,17 +4,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useFeaturedProjects } from '../../../hooks/useProjects';
 import SectionDecoration from '../../shared/SectionDecoration';
-import type { Client } from '../../../types';
 
 gsap.registerPlugin(ScrollTrigger);
-
-// Fallback data while loading or if API fails
-const fallbackClients: Partial<Client>[] = [
-    { id: 'fallback-1', name: 'Project 1', slug: 'project-1' },
-    { id: 'fallback-2', name: 'Project 2', slug: 'project-2' },
-    { id: 'fallback-3', name: 'Project 3', slug: 'project-3' },
-    { id: 'fallback-4', name: 'Project 4', slug: 'project-4' },
-];
 
 const Showcase = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -23,19 +14,19 @@ const Showcase = () => {
     // Fetch featured clients from API
     const { data: apiClients, isLoading, error } = useFeaturedProjects(4);
 
-    // Use API data or fallback
+    // Use API data only - NO FALLBACK
     const clients = useMemo(() => {
         if (apiClients && apiClients.length > 0) {
             return apiClients;
         }
-        return fallbackClients as Client[];
+        return [];
     }, [apiClients]);
 
     useEffect(() => {
         const container = containerRef.current;
         const cards = cardsRef.current;
 
-        if (!container || !cards || isLoading) return;
+        if (!container || !cards || isLoading || clients.length === 0) return;
 
         // Use gsap.context for proper cleanup scoping
         const ctx = gsap.context(() => {
@@ -93,6 +84,11 @@ const Showcase = () => {
                 </div>
             </section>
         );
+    }
+
+    // Don't render section if no projects
+    if (clients.length === 0) {
+        return null;
     }
 
     return (

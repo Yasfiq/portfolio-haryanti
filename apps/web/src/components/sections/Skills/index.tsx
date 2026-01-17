@@ -7,56 +7,7 @@ import type { Skill } from '../../../types';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Fallback hard skills with default SVG icons
-const fallbackHardSkills: Skill[] = [
-    {
-        id: '1',
-        name: 'Adobe Photoshop',
-        shortName: 'Photoshop',
-        gradientFrom: '#31A8FF',
-        gradientTo: '#001E36',
-        category: 'HARD_SKILL',
-        order: 0,
-    },
-    {
-        id: '2',
-        name: 'Figma',
-        shortName: 'Figma',
-        gradientFrom: '#F24E1E',
-        gradientTo: '#1ABCFE',
-        gradientVia: '#A259FF',
-        category: 'HARD_SKILL',
-        order: 1,
-    },
-    {
-        id: '3',
-        name: 'Adobe Illustrator',
-        shortName: 'Illustrator',
-        gradientFrom: '#FF9A00',
-        gradientTo: '#330000',
-        category: 'HARD_SKILL',
-        order: 2,
-    },
-    {
-        id: '4',
-        name: 'Canva Pro',
-        shortName: 'Canva',
-        gradientFrom: '#00C4CC',
-        gradientTo: '#7B2FF7',
-        category: 'HARD_SKILL',
-        order: 3,
-    },
-];
-
-// Fallback soft skills
-const fallbackSoftSkills: Skill[] = [
-    { id: '5', name: 'Communication', category: 'SOFT_SKILL', order: 0 },
-    { id: '6', name: 'Problem Solving', category: 'SOFT_SKILL', order: 1 },
-    { id: '7', name: 'Time Management', category: 'SOFT_SKILL', order: 2 },
-    { id: '8', name: 'Collaboration', category: 'SOFT_SKILL', order: 3 },
-];
-
-// Default soft skill icons mapping
+// Default soft skill icons mapping (for when no iconUrl is provided)
 const softSkillIcons: Record<string, string> = {
     'Communication': '🎯',
     'Problem Solving': '💡',
@@ -83,28 +34,59 @@ const getGradientStyle = (skill: Skill) => {
     };
 };
 
+// ============================================================================
+// EMPTY STATE COMPONENTS
+// ============================================================================
+
+const EmptyHardSkills = () => (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-secondary/20 flex items-center justify-center mb-4">
+            <span className="text-3xl opacity-50">🛠️</span>
+        </div>
+        <p className="text-muted text-sm">No hard skills added yet</p>
+    </div>
+);
+
+const EmptySoftSkills = () => (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-secondary/20 flex items-center justify-center mb-4">
+            <span className="text-3xl opacity-50">💭</span>
+        </div>
+        <p className="text-muted text-sm">No soft skills added yet</p>
+    </div>
+);
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 const Skills = () => {
     const sectionRef = useRef<HTMLDivElement>(null);
     const softSkillsRef = useRef<HTMLDivElement>(null);
     const hardSkillsRef = useRef<HTMLDivElement>(null);
 
     // Fetch skills from API
-    const { data: apiSkills } = useSkills();
+    const { data: apiSkills, isLoading } = useSkills();
 
-    // Separate and sort skills
+    // Separate and sort skills - NO FALLBACK
     const { hardSkills, softSkills } = useMemo(() => {
-        const skills = apiSkills && apiSkills.length > 0 ? apiSkills : [...fallbackHardSkills, ...fallbackSoftSkills];
+        if (!apiSkills || apiSkills.length === 0) {
+            return { hardSkills: [], softSkills: [] };
+        }
 
-        const hard = skills
+        const hard = apiSkills
             .filter((s) => s.category === 'HARD_SKILL')
             .sort((a, b) => a.order - b.order);
 
-        const soft = skills
+        const soft = apiSkills
             .filter((s) => s.category === 'SOFT_SKILL')
             .sort((a, b) => a.order - b.order);
 
-        return { hardSkills: hard.length > 0 ? hard : fallbackHardSkills, softSkills: soft.length > 0 ? soft : fallbackSoftSkills };
+        return { hardSkills: hard, softSkills: soft };
     }, [apiSkills]);
+
+    // Check if section should be hidden (no skills at all and not loading)
+    const hasAnySkills = hardSkills.length > 0 || softSkills.length > 0;
 
     useEffect(() => {
         const section = sectionRef.current;
@@ -160,8 +142,32 @@ const Skills = () => {
         };
     }, [hardSkills.length, softSkills.length]);
 
+    // Don't render section at all if no skills and not loading
+    if (!isLoading && !hasAnySkills) {
+        return null;
+    }
+
+    // Show loading state
+    if (isLoading) {
+        return (
+            <section className="section-container min-h-[calc(100vh-12rem)]">
+                <div className="relative text-center mb-golden-7">
+                    <h2 className="text-xl md:text-2xl font-bold">
+                        Skills & Expertise
+                    </h2>
+                </div>
+                <div className="flex items-center justify-center py-20">
+                    <div className="text-center">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                        <p className="text-muted">Loading skills...</p>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     return (
-        <section ref={sectionRef} className="section-container">
+        <section ref={sectionRef} className="section-container min-h-[calc(100vh-12rem)]">
             {/* Section Title with Decoration */}
             <div className="relative text-center mb-golden-7">
                 <SectionDecoration
@@ -180,69 +186,81 @@ const Skills = () => {
             </div>
 
             <div className="grid md:grid-cols-2 gap-golden-7">
-                {/* Hard Skills - Compact Cards (#6) */}
+                {/* Hard Skills */}
                 <div>
                     <h3 className="text-lg font-semibold mb-golden-5 text-primary">
                         Hard Skills
                     </h3>
-                    <div ref={hardSkillsRef} className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                        {hardSkills.map((skill) => (
-                            <div
-                                key={skill.id}
-                                className="hard-skill-card group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 p-3 rounded-xl flex flex-col items-center justify-center text-center gap-2"
-                                style={getGradientStyle(skill)}
-                            >
-                                {/* Icon - directly on gradient background */}
-                                <div className="flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
-                                    {skill.iconUrl ? (
-                                        <img
-                                            src={skill.iconUrl}
-                                            alt={skill.name}
-                                            className="w-full h-full object-contain"
-                                        />
-                                    ) : (
-                                        <span className="text-2xl font-bold">
-                                            {(skill.shortName || skill.name).charAt(0)}
-                                        </span>
-                                    )}
+                    {hardSkills.length > 0 ? (
+                        <div ref={hardSkillsRef} className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                            {hardSkills.map((skill) => (
+                                <div
+                                    key={skill.id}
+                                    className="hard-skill-card group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 p-3 rounded-xl flex flex-col items-center justify-center text-center gap-2"
+                                    style={getGradientStyle(skill)}
+                                >
+                                    {/* Icon - directly on gradient background */}
+                                    <div className="flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
+                                        {skill.iconUrl ? (
+                                            <img
+                                                src={skill.iconUrl}
+                                                alt={skill.name}
+                                                className="w-full h-full object-contain"
+                                            />
+                                        ) : (
+                                            <span className="text-2xl font-bold">
+                                                {(skill.shortName || skill.name).charAt(0)}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {/* Text */}
+                                    <span className="text-base font-medium drop-shadow-md leading-tight">
+                                        {skill.shortName || skill.name}
+                                    </span>
                                 </div>
-                                {/* Text */}
-                                <span className="text-base font-medium drop-shadow-md leading-tight">
-                                    {skill.shortName || skill.name}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div ref={hardSkillsRef}>
+                            <EmptyHardSkills />
+                        </div>
+                    )}
                 </div>
 
-                {/* Soft Skills - NO DESCRIPTION per client request (#6) */}
+                {/* Soft Skills */}
                 <div ref={softSkillsRef}>
                     <h3 className="text-lg font-semibold mb-golden-5 text-primary">
                         Soft Skills
                     </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                        {softSkills.map((skill) => (
-                            <div
-                                key={skill.id}
-                                className="soft-skill-card card flex items-center gap-3 p-4"
-                            >
-                                {/* Icon - uploaded or default emoji */}
-                                {skill.iconUrl ? (
-                                    <img
-                                        src={skill.iconUrl}
-                                        alt={skill.name}
-                                        className="w-8 h-8 object-contain"
-                                    />
-                                ) : (
-                                    <span className="text-2xl">
-                                        {softSkillIcons[skill.name] || '✨'}
-                                    </span>
-                                )}
-                                {/* Name only - NO description per client request */}
-                                <span className="font-medium">{skill.name}</span>
-                            </div>
-                        ))}
-                    </div>
+                    {softSkills.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-3">
+                            {softSkills.map((skill) => (
+                                <div
+                                    key={skill.id}
+                                    className="soft-skill-card card flex items-center gap-3 p-4 w-max"
+                                >
+                                    {/* Icon - uploaded or default emoji */}
+                                    <div className="flex-shrink-0">
+                                        {skill.iconUrl ? (
+                                            <img
+                                                src={skill.iconUrl}
+                                                alt={skill.name}
+                                                className="w-8 h-8 object-contain"
+                                            />
+                                        ) : (
+                                            <span className="text-2xl">
+                                                {softSkillIcons[skill.name] || '✨'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {/* Name only - NO description per client request */}
+                                    <span className="font-medium truncate">{skill.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <EmptySoftSkills />
+                    )}
                 </div>
             </div>
         </section>

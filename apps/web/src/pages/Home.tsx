@@ -3,7 +3,8 @@ import Hero from '../components/sections/Hero';
 import Showcase from '../components/sections/Showcase';
 import Skills from '../components/sections/Skills';
 // import Services from '../components/sections/Services'; // Temporarily hidden per client request
-// import Experience from '../components/sections/Experience';
+// import Experience from '../components/sections/Experience'; // Old version (backup)
+import ExperienceV2 from '../components/sections/ExperienceV2';
 import ContactCTA from '../components/sections/ContactCTA';
 
 const Home = () => {
@@ -23,7 +24,7 @@ const Home = () => {
             <Showcase />
             <Skills />
             {/* <Services /> */}{/* Temporarily hidden per client request */}
-            {/* <Experience /> */}
+            <ExperienceV2 />
             <ContactCTA />
         </>
     );
