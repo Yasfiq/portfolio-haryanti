@@ -29,7 +29,7 @@ export default function FloatingWhatsApp() {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={`fixed bottom-5 right-5 z-50 group transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`fixed bottom-5 right-5 z-50 group transition-all duration-500 hidden md:block ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                 }`}
             aria-label="Chat via WhatsApp"
         >

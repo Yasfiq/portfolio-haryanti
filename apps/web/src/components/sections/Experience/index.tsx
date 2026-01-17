@@ -147,7 +147,7 @@ const Experience = () => {
           scrub: 0.5,
           anticipatePin: 1,
           end: () => `+=${panels.scrollWidth - window.innerWidth}`,
-          invalidateOnRefresh: true,
+          invalidateOnRefresh: false,
           onToggle: (self) => {
             setIsPinned(self.isActive);
           },
@@ -168,7 +168,12 @@ const Experience = () => {
         ctxRef.current.revert();
       }
     };
-  }, [experiences.length, containerRef, ctxRef, panelsRef, activeIndex]);
+  }, [experiences.length, containerRef, ctxRef, panelsRef, activeIndex, isPinned]);
+
+  console.log(isPinned, 'isPinned')
+  console.log(activeIndex, 'activeIndex')
+  console.log(panelsRef.current, 'panelsRef')
+  console.log(containerRef.current, 'containerRef')
 
   // Get background style for a panel
   const getPanelBackground = (exp: ExperienceType) => {
@@ -204,23 +209,20 @@ const Experience = () => {
           <div key={exp.id} className="flex items-center">
             <div className="flex flex-col items-center">
               <div
-                className={`w-3 h-3 md:w-4 md:h-4 rounded-full transition-all duration-300 ${
-                  index === activeIndex
-                    ? 'bg-primary shadow-lg shadow-primary/50 scale-125'
-                    : 'bg-secondary/50'
-                }`}
+                className={`w-3 h-3 md:w-4 md:h-4 rounded-full transition-all duration-300 ${index === activeIndex
+                  ? 'bg-primary shadow-lg shadow-primary/50 scale-125'
+                  : 'bg-secondary/50'
+                  }`}
               />
               <span
-                className={`text-[10px] md:text-xs mt-1 md:mt-2 transition-colors ${
-                  index === activeIndex ? 'text-primary' : 'text-muted'
-                }`}
+                className={`text-[10px] md:text-xs mt-1 md:mt-2 transition-colors ${index === activeIndex ? 'text-primary' : 'text-muted'
+                  }`}
               >
                 {new Date(exp.startDate).getFullYear()}
               </span>
               <span
-                className={`hidden md:block text-[10px] text-center max-w-[80px] truncate transition-colors ${
-                  index === activeIndex ? 'text-foreground' : 'text-muted'
-                }`}
+                className={`hidden md:block text-[10px] text-center max-w-[80px] truncate transition-colors ${index === activeIndex ? 'text-foreground' : 'text-muted'
+                  }`}
               >
                 {exp.role.split(' ')[0]}
               </span>
@@ -247,8 +249,8 @@ const Experience = () => {
       className="relative w-full h-screen overflow-hidden"
     >
       {/* Timeline - render in portal when pinned to avoid GSAP conflicts */}
-      {isPinned ? (
-        createPortal(<TimelineIndicator />, document.body)
+      {isPinned && containerRef.current ? (
+        createPortal(<TimelineIndicator />, containerRef.current)
       ) : (
         <TimelineIndicator />
       )}
