@@ -63,16 +63,6 @@ const Hero = () => {
 
     const navHeight = isMobile ? MOBILE_NAVBAR_HEIGHT : NAVBAR_HEIGHT;
 
-    // On mobile, we want content to be desktop-sized but scrollable
-    // Calculate the scroll width based on the content
-    const panelWidth = isMobile ? DESKTOP_REFERENCE_WIDTH : window.innerWidth;
-
-    // For mobile single slide, calculate how much to scroll (content width - viewport width)
-    const getMobileScrollAmount = () => {
-        if (!isMobile) return 0;
-        return Math.max(DESKTOP_REFERENCE_WIDTH - window.innerWidth, 0);
-    };
-
     // Check if we should use horizontal scroll
     // Desktop: only if more than 1 slide
     // Mobile: always (to scroll single panel content or multiple slides)
@@ -90,7 +80,6 @@ const Hero = () => {
 
         if (isMobile) {
             // Mobile: scroll through desktop-width content
-            const mobileScrollPerPanel = getMobileScrollAmount();
             totalScrollWidth = (slides.length * DESKTOP_REFERENCE_WIDTH) - window.innerWidth;
         } else {
             // Desktop: scroll through panels
